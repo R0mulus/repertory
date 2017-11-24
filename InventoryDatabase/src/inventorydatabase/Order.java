@@ -5,20 +5,10 @@
  */
 package inventorydatabase;
 
-import gui.LoginForm;
-
-
 /**
  *
  * @author Joseph
  */
-public class InventoryDatabase {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        LoginForm loginform = new LoginForm();
-    }
+public class Order {
     
 }
