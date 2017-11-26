@@ -5,6 +5,7 @@
  */
 package database;
 
+import inventorydatabase.Goods;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,6 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import inventorydatabase.Person;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -116,5 +119,31 @@ public class ConnectionProvider {
             }
         }
         return person;
+    }
+    
+    public List<Goods> getGoods(){
+        String query = "SELECT * FROM Goods";
+        Connection conn = getConnection();
+        Goods goods = null;
+        List<Goods> listOfGoods = new ArrayList();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    int goodsID = rs.getInt("id");
+                    String goodsName = rs.getString("name");
+                    String goodsCode = rs.getString("code");
+                    int goodsQuantity = rs.getInt("quantity");
+                    goods = new Goods(goodsID, goodsName, goodsCode, goodsQuantity );
+                    listOfGoods.add(goods);
+                }
+                conn.close();
+                return listOfGoods;
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return null; 
     }
 }

@@ -6,9 +6,14 @@
 package gui;
 
 import database.ConnectionProvider;
+import inventorydatabase.Goods;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import inventorydatabase.Person;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 /**
  *
@@ -18,6 +23,8 @@ public class MainForm extends javax.swing.JFrame {
     private int id;
     private Person person = null;
     private JFrame loginFrame;
+    private TableColumn tableColumnID;
+    private List<Goods> goods = new ArrayList();
     /**
      * Creates new form MainForm
      */
@@ -25,19 +32,22 @@ public class MainForm extends javax.swing.JFrame {
         initComponents();
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
+        setTitle("Stock organizer");
         this.id = id;
-        this.setVisible(true);
+        setVisible(true);
         this.loginFrame = loginFrame;
         getPerson();
         if(!isUserInformationPresent()){
             JOptionPane.showMessageDialog(null, "Your account is to be empty. \nCall administrator now.", "Account error", JOptionPane.ERROR_MESSAGE);
-            this.dispose();
+            dispose();
             loginFrame.setVisible(true);
         }else{
             String fullName = person.getFirstName() + " " + person.getLastName();
             lblWelcomeUser.setText("Welcome " + fullName);
         }
-        
+        tableColumnID = tableGoods.getColumnModel().getColumn(3);
+        hideColumn(tableColumnID);
+        fillTable();
     }
 
     /**
@@ -50,9 +60,13 @@ public class MainForm extends javax.swing.JFrame {
     private void initComponents() {
 
         lblWelcomeUser = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tableGoods = new javax.swing.JTable();
+        btnReceive = new javax.swing.JButton();
+        btnShip = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -66,10 +80,50 @@ public class MainForm extends javax.swing.JFrame {
 
         lblWelcomeUser.setText("Welcome ");
 
-        jMenu1.setText("File");
+        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel1.setText("Stock");
 
-        jMenuItem1.setText("jMenuItem1");
-        jMenu1.add(jMenuItem1);
+        tableGoods.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Name", "Code", "Quantity", "id"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tableGoods);
+        if (tableGoods.getColumnModel().getColumnCount() > 0) {
+            tableGoods.getColumnModel().getColumn(0).setResizable(false);
+            tableGoods.getColumnModel().getColumn(1).setResizable(false);
+            tableGoods.getColumnModel().getColumn(2).setResizable(false);
+            tableGoods.getColumnModel().getColumn(3).setResizable(false);
+        }
+
+        btnReceive.setText("Receive");
+        btnReceive.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        btnReceive.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReceiveActionPerformed(evt);
+            }
+        });
+
+        btnShip.setText("Ship");
+        btnShip.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        btnShip.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnShipActionPerformed(evt);
+            }
+        });
+
+        jMenu1.setText("File");
 
         jMenuItem2.setText("jMenuItem2");
         jMenu1.add(jMenuItem2);
@@ -89,17 +143,39 @@ public class MainForm extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(593, Short.MAX_VALUE)
-                .addComponent(lblWelcomeUser, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(btnShip, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnReceive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 83, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblWelcomeUser)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, 0)
-                .addComponent(lblWelcomeUser)
-                .addGap(399, 399, 399))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblWelcomeUser)
+                        .addGap(8, 8, 8)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnReceive)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnShip)))
+                .addGap(62, 62, 62))
         );
 
         pack();
@@ -114,6 +190,14 @@ public class MainForm extends javax.swing.JFrame {
             System.exit(0);
         }
     }//GEN-LAST:event_formWindowClosing
+
+    private void btnReceiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReceiveActionPerformed
+        //ReceiveGoodsDialog recGoodsDia = new ReceiveGoodsDialog(this, true);
+    }//GEN-LAST:event_btnReceiveActionPerformed
+
+    private void btnShipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShipActionPerformed
+        //ShipGoodsDialog shipGoodsDia = new ShipGoodsDialog(this, true);
+    }//GEN-LAST:event_btnShipActionPerformed
     
     private void getPerson(){
         ConnectionProvider conn = new ConnectionProvider();
@@ -124,14 +208,59 @@ public class MainForm extends javax.swing.JFrame {
         int idAcc = person.getIdAcc();
         return idAcc == -1 ? false : true;
     }
+    private void hideColumn(TableColumn tableColumn){
+        tableColumn.setMinWidth(0);
+        tableColumn.setMaxWidth(0);
+        tableColumn.setWidth(0);
+    }
+    /*
+    *   Fills table with goods from database
+    */
+    private void fillTable(){
+        if(goods.isEmpty()){
+            fillListWithGoods();
+        }else{
+            goods.removeAll(goods);
+            fillListWithGoods();
+        }
+        
+        DefaultTableModel model = (DefaultTableModel) tableGoods.getModel();
+
+        int rowCount = model.getRowCount();
+        for (int i = rowCount - 1; i >= 0; i--) {
+            model.removeRow(i);
+        }
+        
+        for (Goods goods : goods) {
+            Object[] o = new Object[5];
+            o[0] = goods.getName();
+            o[1] = goods.getCode();
+            o[2] = goods.getQuantity();
+            o[3] = goods.getId();
+            model.addRow(o);
+        }
+        
+    }
+    
+    /*
+    *   Fills atribute 'goods' with goods from database
+    */
+    private void fillListWithGoods(){
+        ConnectionProvider conn = new ConnectionProvider();
+        goods = conn.getGoods();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnReceive;
+    private javax.swing.JButton btnShip;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblWelcomeUser;
+    private javax.swing.JTable tableGoods;
     // End of variables declaration//GEN-END:variables
 }
