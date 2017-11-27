@@ -24,7 +24,9 @@ import java.util.List;
  */
 public class ConnectionProvider {
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+    //dtb pass for school computer = admin
+    //dtb pass for elsewhere = ""
+    private static final String PASSWORD = "admin";
     private static final String URL = "jdbc:mysql://localhost/";
     private static final String DBNAME = "inventory";
     private static final String DRIVER = "com.mysql.jdbc.Driver";
@@ -134,8 +136,10 @@ public class ConnectionProvider {
                     int goodsID = rs.getInt("id");
                     String goodsName = rs.getString("name");
                     String goodsCode = rs.getString("code");
+                    String goodsUnit = rs.getString("unit");
                     int goodsQuantity = rs.getInt("quantity");
-                    goods = new Goods(goodsID, goodsName, goodsCode, goodsQuantity );
+                    float goodsPricePerUnit = rs.getFloat("pricePerUnit");
+                    goods = new Goods(goodsID, goodsName, goodsCode, goodsUnit, goodsQuantity, goodsPricePerUnit );
                     listOfGoods.add(goods);
                 }
                 conn.close();

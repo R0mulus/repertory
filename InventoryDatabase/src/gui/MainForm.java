@@ -23,7 +23,6 @@ public class MainForm extends javax.swing.JFrame {
     private int id;
     private Person person = null;
     private JFrame loginFrame;
-    private TableColumn tableColumnID;
     private List<Goods> goods = new ArrayList();
     /**
      * Creates new form MainForm
@@ -45,8 +44,7 @@ public class MainForm extends javax.swing.JFrame {
             String fullName = person.getFirstName() + " " + person.getLastName();
             lblWelcomeUser.setText("Welcome " + fullName);
         }
-        tableColumnID = tableGoods.getColumnModel().getColumn(3);
-        hideColumn(tableColumnID);
+        hideColumn(5);
         fillTable();
     }
 
@@ -88,11 +86,11 @@ public class MainForm extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "Code", "Quantity", "id"
+                "Name", "Code", "Quantity", "Price per unit", "Unit type", "id"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -105,6 +103,8 @@ public class MainForm extends javax.swing.JFrame {
             tableGoods.getColumnModel().getColumn(1).setResizable(false);
             tableGoods.getColumnModel().getColumn(2).setResizable(false);
             tableGoods.getColumnModel().getColumn(3).setResizable(false);
+            tableGoods.getColumnModel().getColumn(4).setResizable(false);
+            tableGoods.getColumnModel().getColumn(5).setResizable(false);
         }
 
         btnReceive.setText("Receive");
@@ -146,27 +146,25 @@ public class MainForm extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(btnShip, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnReceive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnShip, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnReceive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 500, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 83, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 581, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(106, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblWelcomeUser)))
-                .addContainerGap())
+                        .addComponent(lblWelcomeUser)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblWelcomeUser)
-                        .addGap(8, 8, 8)
+                        .addGap(22, 22, 22)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
@@ -174,7 +172,8 @@ public class MainForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnReceive)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnShip)))
+                        .addComponent(btnShip))
+                    .addComponent(lblWelcomeUser))
                 .addGap(62, 62, 62))
         );
 
@@ -192,11 +191,11 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void btnReceiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReceiveActionPerformed
-        //ReceiveGoodsDialog recGoodsDia = new ReceiveGoodsDialog(this, true);
+        ReceiveGoodsDialog recGoodsDia = new ReceiveGoodsDialog(this, true);
     }//GEN-LAST:event_btnReceiveActionPerformed
 
     private void btnShipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShipActionPerformed
-        //ShipGoodsDialog shipGoodsDia = new ShipGoodsDialog(this, true);
+        ShipGoodsDialog shipGoodsDia = new ShipGoodsDialog(this, true);
     }//GEN-LAST:event_btnShipActionPerformed
     
     private void getPerson(){
@@ -232,11 +231,13 @@ public class MainForm extends javax.swing.JFrame {
         }
         
         for (Goods goods : goods) {
-            Object[] o = new Object[5];
+            Object[] o = new Object[6];
             o[0] = goods.getName();
             o[1] = goods.getCode();
             o[2] = goods.getQuantity();
-            o[3] = goods.getId();
+            o[4] = goods.getPricePerUnit();
+            o[3] = goods.getUnit();
+            o[5] = goods.getId();
             model.addRow(o);
         }
         
@@ -248,6 +249,11 @@ public class MainForm extends javax.swing.JFrame {
     private void fillListWithGoods(){
         ConnectionProvider conn = new ConnectionProvider();
         goods = conn.getGoods();
+    }
+    
+    private void hideColumn(int columnIndex){
+        TableColumn tableColumnID = tableGoods.getColumnModel().getColumn(columnIndex);
+        hideColumn(tableColumnID);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

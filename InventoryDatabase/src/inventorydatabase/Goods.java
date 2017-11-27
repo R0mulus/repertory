@@ -13,16 +13,20 @@ public class Goods {
     private int id;
     private String name;
     private String code;
+    private String unit;
     private int quantity;
+    private float pricePerUnit;
 
     public Goods() {
     }
 
-    public Goods(int id, String name, String code, int quantity) {
+    public Goods(int id, String name, String code, String unit, int quantity, float pricePerUnit) {
         this.id = id;
         this.name = name;
         this.code = code;
+        this.unit = unit;
         this.quantity = quantity;
+        this.pricePerUnit = pricePerUnit;
     }
 
     public int getId() {
@@ -49,6 +53,14 @@ public class Goods {
         this.code = code;
     }
 
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     public int getQuantity() {
         return quantity;
     }
@@ -56,6 +68,16 @@ public class Goods {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    public float getPricePerUnit() {
+        return pricePerUnit;
+    }
+
+    public void setPricePerUnit(float pricePerUnit) {
+        this.pricePerUnit = pricePerUnit;
+    }
+
+    
     
     
     
