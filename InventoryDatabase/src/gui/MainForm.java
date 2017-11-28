@@ -5,7 +5,12 @@
  */
 package gui;
 
+import gui.dialogs.NewCustomerDialog;
+import gui.dialogs.NewShipperDialog;
+import gui.dialogs.ArrivalOfGoodsDialog;
+import gui.dialogs.ShipGoodsDialog;
 import database.ConnectionProvider;
+import gui.dialogs.NewSupplierDialog;
 import inventorydatabase.Goods;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -42,7 +47,9 @@ public class MainForm extends javax.swing.JFrame {
             loginFrame.setVisible(true);
         }else{
             String fullName = person.getFirstName() + " " + person.getLastName();
+            String cardID = person.getCardId();
             lblWelcomeUser.setText("Welcome " + fullName);
+            lblCardID.setText("Card ID: " + cardID);
         }
         hideColumn(5);
         fillTable();
@@ -63,9 +70,12 @@ public class MainForm extends javax.swing.JFrame {
         tableGoods = new javax.swing.JTable();
         btnReceive = new javax.swing.JButton();
         btnShip = new javax.swing.JButton();
+        lblCardID = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        menuAddShipper = new javax.swing.JMenuItem();
+        menuAddCustomer = new javax.swing.JMenuItem();
+        menuAddSupplier = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
 
@@ -76,7 +86,7 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
-        lblWelcomeUser.setText("Welcome ");
+        lblWelcomeUser.setText("Welcome sign");
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel1.setText("Stock");
@@ -123,10 +133,33 @@ public class MainForm extends javax.swing.JFrame {
             }
         });
 
+        lblCardID.setText("cardID");
+
         jMenu1.setText("File");
 
-        jMenuItem2.setText("jMenuItem2");
-        jMenu1.add(jMenuItem2);
+        menuAddShipper.setText("New Shipper");
+        menuAddShipper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuAddShipperActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuAddShipper);
+
+        menuAddCustomer.setText("New Customer");
+        menuAddCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuAddCustomerActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuAddCustomer);
+
+        menuAddSupplier.setText("New Supplier");
+        menuAddSupplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuAddSupplierActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuAddSupplier);
 
         jMenuBar1.add(jMenu1);
 
@@ -145,19 +178,21 @@ public class MainForm extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnShip, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnReceive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(btnShip, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnReceive, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 581, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(106, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 101, Short.MAX_VALUE)
+                        .addComponent(lblCardID))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblWelcomeUser)
-                        .addContainerGap())))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(lblWelcomeUser)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -173,7 +208,10 @@ public class MainForm extends javax.swing.JFrame {
                         .addComponent(btnReceive)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnShip))
-                    .addComponent(lblWelcomeUser))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblWelcomeUser)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblCardID)))
                 .addGap(62, 62, 62))
         );
 
@@ -191,12 +229,24 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void btnReceiveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReceiveActionPerformed
-        ReceiveGoodsDialog recGoodsDia = new ReceiveGoodsDialog(this, true);
+        ArrivalOfGoodsDialog recGoodsDia = new ArrivalOfGoodsDialog(this, true);
     }//GEN-LAST:event_btnReceiveActionPerformed
 
     private void btnShipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShipActionPerformed
         ShipGoodsDialog shipGoodsDia = new ShipGoodsDialog(this, true);
     }//GEN-LAST:event_btnShipActionPerformed
+
+    private void menuAddShipperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddShipperActionPerformed
+        NewShipperDialog newShipperForm = new NewShipperDialog(this, true);
+    }//GEN-LAST:event_menuAddShipperActionPerformed
+
+    private void menuAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddCustomerActionPerformed
+        NewCustomerDialog newCustomerDialog = new NewCustomerDialog(this, true);
+    }//GEN-LAST:event_menuAddCustomerActionPerformed
+
+    private void menuAddSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddSupplierActionPerformed
+        NewSupplierDialog newSupplierDialog = new NewSupplierDialog(this, true);
+    }//GEN-LAST:event_menuAddSupplierActionPerformed
     
     private void getPerson(){
         ConnectionProvider conn = new ConnectionProvider();
@@ -235,8 +285,8 @@ public class MainForm extends javax.swing.JFrame {
             o[0] = goods.getName();
             o[1] = goods.getCode();
             o[2] = goods.getQuantity();
-            o[4] = goods.getPricePerUnit();
-            o[3] = goods.getUnit();
+            o[3] = goods.getPricePerUnit();
+            o[4] = goods.getUnit();
             o[5] = goods.getId();
             model.addRow(o);
         }
@@ -263,10 +313,13 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblCardID;
     private javax.swing.JLabel lblWelcomeUser;
+    private javax.swing.JMenuItem menuAddCustomer;
+    private javax.swing.JMenuItem menuAddShipper;
+    private javax.swing.JMenuItem menuAddSupplier;
     private javax.swing.JTable tableGoods;
     // End of variables declaration//GEN-END:variables
 }

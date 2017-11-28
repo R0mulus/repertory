@@ -9,10 +9,29 @@
             <Property name="text" type="java.lang.String" value="File"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
+            <MenuItem class="javax.swing.JMenuItem" name="menuAddShipper">
               <Properties>
-                <Property name="text" type="java.lang.String" value="jMenuItem2"/>
+                <Property name="text" type="java.lang.String" value="New Shipper"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuAddShipperActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuAddCustomer">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="New Customer"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuAddCustomerActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="menuAddSupplier">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="New Supplier"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuAddSupplierActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -59,23 +78,26 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="btnShip" alignment="1" max="32767" attributes="0"/>
-                  <Component id="btnReceive" alignment="1" min="-2" pref="71" max="-2" attributes="0"/>
-                  <Component id="jLabel1" pref="73" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jLabel1" min="-2" pref="73" max="-2" attributes="0"/>
+                  <Group type="103" alignment="1" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="btnShip" alignment="1" max="32767" attributes="0"/>
+                      <Component id="btnReceive" alignment="1" pref="71" max="32767" attributes="0"/>
+                  </Group>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="jScrollPane1" min="-2" pref="581" max="-2" attributes="0"/>
-                      <EmptySpace pref="106" max="32767" attributes="0"/>
+                      <EmptySpace pref="101" max="32767" attributes="0"/>
+                      <Component id="lblCardID" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       <Component id="lblWelcomeUser" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -95,7 +117,11 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnShip" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="lblWelcomeUser" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="lblWelcomeUser" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lblCardID" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace min="-2" pref="62" max="-2" attributes="0"/>
           </Group>
@@ -105,7 +131,7 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="lblWelcomeUser">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Welcome "/>
+        <Property name="text" type="java.lang.String" value="Welcome sign"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
@@ -197,6 +223,11 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnShipActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblCardID">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="cardID"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
