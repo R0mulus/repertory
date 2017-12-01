@@ -24,8 +24,8 @@ CREATE TABLE UserPersonal(
 
 CREATE TABLE Addresses(
 	id INT NOT NULL AUTO_INCREMENT,
-	country VARCHAR(50) NOT NULL,
-	countryState VARCHAR(30) NOT NULL,
+	country VARCHAR(100) NOT NULL,
+	countryState VARCHAR(100) NOT NULL,
 	postalCode VARCHAR(10) NOT NULL,
 	city VARCHAR(50) NOT NULL,
 	street VARCHAR(50) NOT NULL,
@@ -35,9 +35,8 @@ CREATE TABLE Addresses(
 
 CREATE TABLE Goods(
 	id INT NOT NULL AUTO_INCREMENT,
-	name VARCHAR(50) NOT NULL,
+	name VARCHAR(100) NOT NULL,
 	code VARCHAR(50) NOT NULL,
-	unit VARCHAR(30) NOT NULL,
 	quantity INT NOT NULL,
 	pricePerUnit FLOAT(10,2) NOT NULL,
 	PRIMARY KEY(id)
@@ -46,7 +45,7 @@ CREATE TABLE Goods(
 CREATE TABLE Suppliers(
 	id INT NOT NULL AUTO_INCREMENT,
 	idAddress INT NOT NULL,
-	name VARCHAR(30) NOT NULL,
+	name VARCHAR(300) NOT NULL,
 	phone VARCHAR(20) NOT NULL,
 	email VARCHAR(50) NOT NULL,
 	PRIMARY KEY(id),
@@ -57,7 +56,7 @@ CREATE TABLE Suppliers(
 CREATE TABLE Customers(
 	id INT NOT NULL AUTO_INCREMENT,
 	idAddress INT NOT NULL,
-	name VARCHAR(50) NOT NULL,
+	name VARCHAR(300) NOT NULL,
 	phone VARCHAR(20) NOT NULL,
 	email VARCHAR(50) NOT NULL,
 	PRIMARY KEY(id),
@@ -68,7 +67,7 @@ CREATE TABLE Customers(
 CREATE TABLE Shippers(
 	id INT NOT NULL AUTO_INCREMENT,
 	idAddress INT NOT NULL,
-	name VARCHAR(30) NOT NULL,
+	name VARCHAR(300) NOT NULL,
 	phone VARCHAR(20) NOT NULL,
 	email VARCHAR(50) NOT NULL,
 	PRIMARY KEY(id),
@@ -133,6 +132,6 @@ CREATE TABLE ArrivalDetails(
 		ON DELETE CASCADE ON UPDATE RESTRICT
 );
 
-
-
-
+insert into accounts (login, password,datecreated,lastpasswordchange) values('admin','admin','2017-12-1','2017-12-1');
+insert into userpersonal(idaccount,cardid,firstname,lastname,email) values(1,'00001ITAA1','Jozef','Bálint','balintj@companyname.com');
+INSERT INTO Goods(name, code, quantity, priceperunit) VALUES('sruby','ASD45XS',5000,0.49);

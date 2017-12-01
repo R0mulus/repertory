@@ -136,10 +136,9 @@ public class ConnectionProvider {
                     int goodsID = rs.getInt("id");
                     String goodsName = rs.getString("name");
                     String goodsCode = rs.getString("code");
-                    String goodsUnit = rs.getString("unit");
                     int goodsQuantity = rs.getInt("quantity");
                     float goodsPricePerUnit = rs.getFloat("pricePerUnit");
-                    goods = new Goods(goodsID, goodsName, goodsCode, goodsUnit, goodsQuantity, goodsPricePerUnit );
+                    goods = new Goods(goodsID, goodsName, goodsCode, goodsQuantity, goodsPricePerUnit );
                     listOfGoods.add(goods);
                 }
                 conn.close();

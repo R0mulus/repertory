@@ -51,7 +51,7 @@ public class MainForm extends javax.swing.JFrame {
             lblWelcomeUser.setText("Welcome " + fullName);
             lblCardID.setText("Card ID: " + cardID);
         }
-        hideColumn(5);
+        hideColumn(4);
         fillTable();
     }
 
@@ -96,11 +96,11 @@ public class MainForm extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "Code", "Quantity", "Price per unit", "Unit type", "id"
+                "Name", "Code", "Quantity", "Price per unit", "id"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -114,7 +114,6 @@ public class MainForm extends javax.swing.JFrame {
             tableGoods.getColumnModel().getColumn(2).setResizable(false);
             tableGoods.getColumnModel().getColumn(3).setResizable(false);
             tableGoods.getColumnModel().getColumn(4).setResizable(false);
-            tableGoods.getColumnModel().getColumn(5).setResizable(false);
         }
 
         btnReceive.setText("Receive");
@@ -233,11 +232,11 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_btnReceiveActionPerformed
 
     private void btnShipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShipActionPerformed
-        ShipGoodsDialog shipGoodsDia = new ShipGoodsDialog(this, true);
+        ShipGoodsDialog shipGoodsDialog = new ShipGoodsDialog(this, true);
     }//GEN-LAST:event_btnShipActionPerformed
 
     private void menuAddShipperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddShipperActionPerformed
-        NewShipperDialog newShipperForm = new NewShipperDialog(this, true);
+        NewShipperDialog newShipperDialog = new NewShipperDialog(this, true);
     }//GEN-LAST:event_menuAddShipperActionPerformed
 
     private void menuAddCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddCustomerActionPerformed
@@ -281,13 +280,12 @@ public class MainForm extends javax.swing.JFrame {
         }
         
         for (Goods goods : goods) {
-            Object[] o = new Object[6];
+            Object[] o = new Object[5];
             o[0] = goods.getName();
             o[1] = goods.getCode();
             o[2] = goods.getQuantity();
             o[3] = goods.getPricePerUnit();
-            o[4] = goods.getUnit();
-            o[5] = goods.getId();
+            o[4] = goods.getId();
             model.addRow(o);
         }
         
@@ -304,6 +302,7 @@ public class MainForm extends javax.swing.JFrame {
     private void hideColumn(int columnIndex){
         TableColumn tableColumnID = tableGoods.getColumnModel().getColumn(columnIndex);
         hideColumn(tableColumnID);
+        System.out.println("WTF");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

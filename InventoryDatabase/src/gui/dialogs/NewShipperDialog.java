@@ -6,6 +6,9 @@
 package gui.dialogs;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JTextField;
 
 /**
  *
@@ -23,7 +26,6 @@ public class NewShipperDialog extends javax.swing.JDialog {
         setTitle("Add New Shipper");
         setResizable(false);
         setVisible(true);
-        
     }
 
     /**
@@ -60,12 +62,24 @@ public class NewShipperDialog extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
+        txtName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNameKeyTyped(evt);
+            }
+        });
+
         jLabel9.setText("Street Number");
 
         btnCancel.setText("Cancel");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
+            }
+        });
+
+        txtPhone.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPhoneKeyTyped(evt);
             }
         });
 
@@ -78,7 +92,25 @@ public class NewShipperDialog extends javax.swing.JDialog {
             }
         });
 
+        txtEmail.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtEmailKeyTyped(evt);
+            }
+        });
+
+        txtCountry.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtCountryKeyTyped(evt);
+            }
+        });
+
         jLabel5.setText("Country");
+
+        txtState.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtStateKeyTyped(evt);
+            }
+        });
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         jLabel11.setText("Address");
@@ -210,6 +242,35 @@ public class NewShipperDialog extends javax.swing.JDialog {
         System.out.println("H: " + h + "\nW: " + w);
     }//GEN-LAST:event_btnAddActionPerformed
 
+    private void txtNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNameKeyTyped
+        if(txtName.getText().length() >= 300){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtNameKeyTyped
+
+    private void txtPhoneKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPhoneKeyTyped
+        if(txtPhone.getText().length() >= 20){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtPhoneKeyTyped
+
+    private void txtEmailKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEmailKeyTyped
+        if(txtEmail.getText().length() >= 50){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtEmailKeyTyped
+
+    private void txtCountryKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCountryKeyTyped
+        if(txtCountry.getText().length() >= 100){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtCountryKeyTyped
+
+    private void txtStateKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStateKeyTyped
+        if(txtState.getText().length() >= 100){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtStateKeyTyped
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
