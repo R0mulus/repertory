@@ -5,10 +5,9 @@
  */
 package gui.dialogs;
 
-import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.JTextField;
+import database.ConnectionProvider;
+import errorChecking.InputCheck;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -16,6 +15,7 @@ import javax.swing.JTextField;
  */
 public class NewShipperDialog extends javax.swing.JDialog {
 
+    private InputCheck inputCheck = null;
     /**
      * Creates new form NewShipperDialog
      */
@@ -25,6 +25,7 @@ public class NewShipperDialog extends javax.swing.JDialog {
         setLocationRelativeTo(null);
         setTitle("Add New Shipper");
         setResizable(false);
+        clearWarningLabels();
         setVisible(true);
     }
 
@@ -59,6 +60,15 @@ public class NewShipperDialog extends javax.swing.JDialog {
         jLabel4 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         txtZipCode = new javax.swing.JTextField();
+        lblIncorrectNameWarning = new javax.swing.JLabel();
+        lblIncorrectPhoneWarning = new javax.swing.JLabel();
+        lblIncorrectEmailWarning = new javax.swing.JLabel();
+        lblIncorrectCountryWarning = new javax.swing.JLabel();
+        lblIncorrectStateWarning = new javax.swing.JLabel();
+        lblIncorrectCityWarning = new javax.swing.JLabel();
+        lblIncorrectStreetWarning = new javax.swing.JLabel();
+        lblIncorrectStreetNumWarning = new javax.swing.JLabel();
+        lblIncorrectZipCodeWarning = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -117,6 +127,12 @@ public class NewShipperDialog extends javax.swing.JDialog {
 
         jLabel6.setText("Country State");
 
+        txtCity.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtCityKeyTyped(evt);
+            }
+        });
+
         jLabel7.setText("City");
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
@@ -124,11 +140,50 @@ public class NewShipperDialog extends javax.swing.JDialog {
 
         jLabel2.setText("Name");
 
+        txtStreet.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtStreetKeyTyped(evt);
+            }
+        });
+
         jLabel3.setText("Phone Number");
 
         jLabel4.setText("Email");
 
         jLabel8.setText("Street");
+
+        txtZipCode.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtZipCodeKeyTyped(evt);
+            }
+        });
+
+        lblIncorrectNameWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblIncorrectNameWarning.setText(" ");
+
+        lblIncorrectPhoneWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblIncorrectPhoneWarning.setText(" ");
+
+        lblIncorrectEmailWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblIncorrectEmailWarning.setText(" ");
+
+        lblIncorrectCountryWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblIncorrectCountryWarning.setText(" ");
+
+        lblIncorrectStateWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblIncorrectStateWarning.setText(" ");
+
+        lblIncorrectCityWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblIncorrectCityWarning.setText(" ");
+
+        lblIncorrectStreetWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblIncorrectStreetWarning.setText(" ");
+
+        lblIncorrectStreetNumWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblIncorrectStreetNumWarning.setText(" ");
+
+        lblIncorrectZipCodeWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblIncorrectZipCodeWarning.setText(" ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -137,43 +192,73 @@ public class NewShipperDialog extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addGap(39, 39, 39)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel4))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jLabel4))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(txtName, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtEmail, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel3)
+                                    .addGap(10, 10, 10)
+                                    .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addGap(10, 10, 10)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addComponent(lblIncorrectNameWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addGap(23, 23, 23))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addComponent(lblIncorrectEmailWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addGap(24, 24, 24)))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addComponent(lblIncorrectPhoneWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(20, 20, 20)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(59, 59, 59)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel11)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel6)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel9)
-                                    .addComponent(jLabel10))
-                                .addGap(37, 37, 37)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel5)
+                                            .addComponent(jLabel6)
+                                            .addComponent(jLabel7)
+                                            .addComponent(jLabel8)
+                                            .addComponent(jLabel9)
+                                            .addComponent(jLabel10))
+                                        .addGap(10, 10, 10)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtState, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtCountry, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtCity, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtStreet, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtStreetNum, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtZipCode, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(jLabel11))
+                                .addGap(39, 39, 39))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtState, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtCountry, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtCity, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtStreet, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtStreetNum, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtZipCode, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                .addGap(43, 43, 43))
+                                    .addComponent(lblIncorrectStateWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblIncorrectStreetWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblIncorrectCountryWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblIncorrectCityWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblIncorrectZipCodeWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblIncorrectStreetNumWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(20, 20, 20)
                 .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(211, 211, 211))
+                .addGap(174, 174, 174))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -185,61 +270,184 @@ public class NewShipperDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(23, 23, 23)
-                        .addComponent(txtCountry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(21, 21, 21)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtCountry, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(22, 22, 22)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel5))
-                        .addGap(24, 24, 24)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(txtState, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jLabel5))))
+                .addGap(5, 5, 5)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblIncorrectNameWarning)
+                    .addComponent(lblIncorrectCountryWarning))
+                .addGap(5, 5, 5)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(75, 75, 75)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(txtState, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(4, 4, 4)
+                        .addComponent(lblIncorrectStateWarning)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(txtCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(4, 4, 4)
+                        .addComponent(lblIncorrectCityWarning)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel8)
                             .addComponent(txtStreet, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(txtPhone, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(5, 5, 5)
+                        .addComponent(lblIncorrectPhoneWarning)
+                        .addGap(5, 5, 5)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
-                            .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel7)
-                            .addComponent(txtCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(22, 22, 22)
+                            .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblIncorrectEmailWarning)))
+                .addGap(4, 4, 4)
+                .addComponent(lblIncorrectStreetWarning)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
                     .addComponent(txtStreetNum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(24, 24, 24)
+                .addGap(4, 4, 4)
+                .addComponent(lblIncorrectStreetNumWarning)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(txtZipCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(46, 46, 46)
+                .addGap(5, 5, 5)
+                .addComponent(lblIncorrectZipCodeWarning)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnCancel)
                     .addComponent(btnAdd))
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+   
+    private void clearWarningLabels(){
+        lblIncorrectNameWarning.setText(" ");
+        lblIncorrectPhoneWarning.setText(" ");
+        lblIncorrectEmailWarning.setText(" ");
+        lblIncorrectCountryWarning.setText(" ");
+        lblIncorrectStateWarning.setText(" ");
+        lblIncorrectCityWarning.setText(" ");
+        lblIncorrectStreetWarning.setText(" ");
+        lblIncorrectStreetNumWarning.setText(" ");
+        lblIncorrectZipCodeWarning.setText(" ");
+    }
+    
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         this.dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        Rectangle r = this.getBounds();
-        int h = r.height;
-        int w = r.width;
-        System.out.println("H: " + h + "\nW: " + w);
+        ConnectionProvider conn = new ConnectionProvider();
+        int idAddress = -1;
+        int streetNum = -1;
+        int[] correctInputs = new int[9];
+        inputCheck = new InputCheck();
+        
+        if(!inputCheck.isInputLengthCorrect(txtName.getText().trim(), 300, 2)){
+            lblIncorrectNameWarning.setText("Shipper name length incorrect!");
+            correctInputs[0] = 0;
+        }else{
+            lblIncorrectNameWarning.setText(" ");
+            correctInputs[0] = 1;
+        }
+        
+        if(!inputCheck.isInputLengthCorrect(txtPhone.getText().trim(), 20, 8) || !inputCheck.isPhoneCorrect(txtPhone.getText())){
+            lblIncorrectPhoneWarning.setText("Phone format or length incorrect!");
+            correctInputs[1] = 0;
+        }else{
+            lblIncorrectPhoneWarning.setText(" ");
+            correctInputs[1] = 1;
+        }
+        
+        if(!inputCheck.isInputLengthCorrect(txtEmail.getText().trim(), 100, 5) || !inputCheck.isEmailCorrect(txtEmail.getText())){
+            lblIncorrectEmailWarning.setText("Email format or length incorrect!");
+            correctInputs[2] = 0;
+        }else{
+            lblIncorrectEmailWarning.setText(" ");
+            correctInputs[2] = 1;
+        }
+        
+        if(!inputCheck.isInputLengthCorrect(txtCountry.getText().trim(), 100, 2)){
+            lblIncorrectCountryWarning.setText("Country name length incorrect!");
+            correctInputs[3] = 0;
+        }else{
+            lblIncorrectCountryWarning.setText(" ");
+            correctInputs[3] = 1;
+        }
+        
+        if(!inputCheck.isInputLengthCorrect(txtState.getText().trim(), 100, 2)){
+            lblIncorrectStateWarning.setText("State name length incorrect!");
+            correctInputs[4] = 0;
+        }else{
+            lblIncorrectStateWarning.setText(" ");
+            correctInputs[4] = 1;
+        }
+        
+        if(!inputCheck.isInputLengthCorrect(txtCity.getText().trim(), 50, 1)){
+            lblIncorrectCityWarning.setText("City name length incorrect!");
+            correctInputs[5] = 0;
+        }else{
+            lblIncorrectCityWarning.setText(" ");
+            correctInputs[5] = 1;
+        }
+        
+        if(!inputCheck.isInputLengthCorrect(txtStreet.getText().trim(), 50, 1)){
+            lblIncorrectStreetWarning.setText("Street name length incorrect!");
+            correctInputs[6] = 0;
+        }else{
+            lblIncorrectStreetWarning.setText(" ");
+            correctInputs[6] = 1;
+        }
+        
+        if(!inputCheck.isInt(txtStreetNum.getText().trim()) && !inputCheck.isInputLengthCorrect(txtStreetNum.getText().trim(), 4, 1)){
+            lblIncorrectStreetNumWarning.setText("Incorrect street number!");
+            correctInputs[7] = 0;
+        }else{
+            lblIncorrectStreetNumWarning.setText(" ");
+            correctInputs[7] = 1;
+        }
+        
+        if(!inputCheck.isInputLengthCorrect(txtZipCode.getText().trim(), 10, 0)){
+            lblIncorrectZipCodeWarning.setText("ZIP code incorrect!");
+            correctInputs[8] = 0;
+        }else{
+            lblIncorrectZipCodeWarning.setText(" ");
+            correctInputs[8] = 1;
+        }
+        
+        int sum = 0;
+        for(int i : correctInputs){
+            sum += i;
+        }
+        if(sum == 9){
+            String zipCode = "";
+            if(txtZipCode.getText().trim().length() > 0){
+                zipCode = txtZipCode.getText().trim();
+            }
+            streetNum = Integer.parseInt(txtStreetNum.getText());
+            idAddress = conn.addNewAddress(txtCountry.getText().trim(), txtState.getText().trim(), zipCode, txtCity.getText().trim(), txtStreet.getText().trim(), streetNum);
+            System.out.println("address added");
+            conn.addNewShipper(idAddress, txtName.getText().trim(), txtPhone.getText().trim(), txtEmail.getText().trim());
+            System.out.println("shipper added");
+            JOptionPane.showMessageDialog(null, "Shipper '" + txtName.getText() + "' added!");
+            this.dispose();
+        }
+        
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void txtNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNameKeyTyped
@@ -255,7 +463,7 @@ public class NewShipperDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_txtPhoneKeyTyped
 
     private void txtEmailKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEmailKeyTyped
-        if(txtEmail.getText().length() >= 50){
+        if(txtEmail.getText().length() >= 100){
             evt.consume();
         }
     }//GEN-LAST:event_txtEmailKeyTyped
@@ -272,6 +480,24 @@ public class NewShipperDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_txtStateKeyTyped
 
+    private void txtCityKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCityKeyTyped
+        if(txtCity.getText().length() >= 50){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtCityKeyTyped
+
+    private void txtStreetKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStreetKeyTyped
+        if(txtStreet.getText().length() >= 50){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtStreetKeyTyped
+
+    private void txtZipCodeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtZipCodeKeyTyped
+        if(txtZipCode.getText().length() >= 10){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtZipCodeKeyTyped
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnCancel;
@@ -286,6 +512,15 @@ public class NewShipperDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel lblIncorrectCityWarning;
+    private javax.swing.JLabel lblIncorrectCountryWarning;
+    private javax.swing.JLabel lblIncorrectEmailWarning;
+    private javax.swing.JLabel lblIncorrectNameWarning;
+    private javax.swing.JLabel lblIncorrectPhoneWarning;
+    private javax.swing.JLabel lblIncorrectStateWarning;
+    private javax.swing.JLabel lblIncorrectStreetNumWarning;
+    private javax.swing.JLabel lblIncorrectStreetWarning;
+    private javax.swing.JLabel lblIncorrectZipCodeWarning;
     private javax.swing.JTextField txtCity;
     private javax.swing.JTextField txtCountry;
     private javax.swing.JTextField txtEmail;

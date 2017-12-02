@@ -302,7 +302,6 @@ public class MainForm extends javax.swing.JFrame {
     private void hideColumn(int columnIndex){
         TableColumn tableColumnID = tableGoods.getColumnModel().getColumn(columnIndex);
         hideColumn(tableColumnID);
-        System.out.println("WTF");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

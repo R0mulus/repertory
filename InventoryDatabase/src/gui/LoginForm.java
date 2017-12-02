@@ -163,7 +163,7 @@ public class LoginForm extends javax.swing.JFrame {
         char[] arrPassword = txtPassword.getPassword();
         String password = new String(arrPassword);
         
-        if(conn.isEmployeePasswordValid(login, password)){
+        if(conn.isAccountPasswordValid(login, password)){
             lblLoginWarning.setText(" ");
             int accID = conn.getAccountID(login);
             this.setVisible(false);
