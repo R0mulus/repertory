@@ -6,7 +6,6 @@
 package gui;
 
 import database.ConnectionProvider;
-import javafx.scene.input.KeyCode;
 
 
 /**
@@ -15,15 +14,16 @@ import javafx.scene.input.KeyCode;
  */
 public class LoginForm extends javax.swing.JFrame {
 
-    private static final String loginWarningMsg = "Incorrect account information!";
+    private static final String LOGIN_WARNING_MSG = "Incorrect account information!";
     /**
      * Creates new form LoginForm
      */
     public LoginForm() {
         initComponents();
         setLocationRelativeTo(null);
-        setVisible(true);
+        setTitle("Stock organizer");
         lblLoginWarning.setText(" ");
+        setVisible(true);
     }
 
     /**
@@ -171,7 +171,7 @@ public class LoginForm extends javax.swing.JFrame {
             txtLogin.setText("");
             txtPassword.setText("");
         }else{
-            lblLoginWarning.setText(loginWarningMsg);
+            lblLoginWarning.setText(LOGIN_WARNING_MSG);
         }
     }
 
