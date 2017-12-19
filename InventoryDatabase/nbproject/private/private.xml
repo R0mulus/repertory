@@ -5,6 +5,9 @@
         <group>
             <file>file:/C:/Users/client/skola/prog/java/FinalProject%20prog/InventoryDatabase/src/gui/MainForm.java</file>
             <file>file:/C:/Users/client/skola/prog/java/FinalProject%20prog/InventoryDatabase/src/database/ConnectionProvider.java</file>
+            <file>file:/C:/Users/client/skola/prog/java/FinalProject%20prog/InventoryDatabase/src/gui/dialogs/ShipGoodsDialog.java</file>
+            <file>file:/C:/Users/client/skola/prog/java/FinalProject%20prog/InventoryDatabase/src/inventorydatabase/Shipper.java</file>
+            <file>file:/C:/Users/client/skola/prog/java/FinalProject%20prog/InventoryDatabase/src/gui/dialogs/ArrivalOfGoodsDialog.java</file>
         </group>
     </open-files>
 </project-private>

@@ -241,4 +241,31 @@ public class ConnectionProvider {
         }
         return idAddress;
     }
+    
+    public List<Goods> getShippers(){
+        String query = "SELECT * FROM Shippers";
+        Connection conn = getConnection();
+        Goods goods = null;
+        List<Goods> listOfGoods = new ArrayList();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    int goodsID = rs.getInt("id");
+                    String goodsName = rs.getString("name");
+                    String goodsCode = rs.getString("code");
+                    int goodsQuantity = rs.getInt("quantity");
+                    float goodsPricePerUnit = rs.getFloat("pricePerUnit");
+                    goods = new Goods(goodsID, goodsName, goodsCode, goodsQuantity, goodsPricePerUnit );
+                    listOfGoods.add(goods);
+                }
+                conn.close();
+                return listOfGoods;
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return null; 
+    }
 }
