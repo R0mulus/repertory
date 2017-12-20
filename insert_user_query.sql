@@ -1,0 +1,1 @@
+INSERT into accounts(login, password) values('admin1',PASSWORD('password'));
