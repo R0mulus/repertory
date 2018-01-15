@@ -5,6 +5,7 @@
  */
 package errorChecking;
 
+import java.math.BigDecimal;
 import org.apache.commons.validator.routines.EmailValidator;
 
 /**
@@ -27,7 +28,6 @@ public class InputCheck {
                 Integer.parseInt(text);
                 return true;
             } catch (NumberFormatException e) {
-                System.out.println("Error parsing to Integer: " + e);
                 return false;
             }
         }
@@ -43,7 +43,18 @@ public class InputCheck {
             Long.parseLong(text);
             return true;
         } catch (NumberFormatException e) {
-            System.out.println("Error parsing to Long: " + e);
+            return false;
+        }
+    }
+    
+    /*
+    *   check if string can be parsed to double data type
+    */
+    public boolean isDouble(String text){
+        try {
+            Double.parseDouble(text);
+            return true;
+        } catch (NumberFormatException e) {
             return false;
         }
     }
@@ -75,6 +86,35 @@ public class InputCheck {
         }
         return false;
 
+    }
+    
+    /*
+    *   check if input has surpassed given decimal point
+    */
+    public boolean hasNumberSurpassedDecimalPoint(Double value, int numberOfDecimalPoints){
+        return BigDecimal.valueOf(value).scale() > numberOfDecimalPoints;
+    }
+    
+    public boolean isPasswordStrongEnough(String password){
+        boolean hasDigit = false;
+        boolean hasLetter = false;
+        if(isInputLengthCorrect(password, 20, 8)){
+            for(char c : password.toCharArray()) {
+                if(Character.isDigit(c)){
+                    hasDigit = true;
+                }else if(Character.isLetter(c)){
+                    hasLetter = true;
+                }else{
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean doPasswordsMatch(String password1, String password2){
+        return password1.equals(password2);
     }
             
 }

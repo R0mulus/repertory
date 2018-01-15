@@ -6,10 +6,13 @@
 package gui.dialogs;
 
 import database.ConnectionProvider;
-import inventorydatabase.Goods;
-import java.awt.Frame;
+import inventorydatabase.Shipper;
+import inventorydatabase.Supplier;
 import java.util.List;
-import javax.swing.table.DefaultTableModel;
+import errorChecking.InputCheck;
+import inventorydatabase.Goods;
+import java.awt.Dimension;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -17,19 +20,51 @@ import javax.swing.table.DefaultTableModel;
  */
 public class ArrivalOfGoodsDialog extends javax.swing.JDialog {
 
-
+    private List<Supplier> suppliers;
+    private List<Shipper> shippers;
+    private int shipperID;
+    private int supplierID;
+    private int userID;
+    private List<Goods> goods;
+    private int idOfNewGoods;
     /**
      * Creates new form ReceiveGoodsDialog
      */
-    public ArrivalOfGoodsDialog(java.awt.Frame parent, boolean modal) {
+    public ArrivalOfGoodsDialog(java.awt.Frame parent, boolean modal, int userID, List<Goods> goods) {
         super(parent, modal);
         initComponents();
         setLocationRelativeTo(null);
         setTitle("Arrival of Goods");
+        fillSuppliers();
+        cmbSupplier.setPreferredSize(new Dimension(150,25));
+        fillShippers();
+        cmbShipper.setPreferredSize(new Dimension(150,25));
+        this.userID = userID;
+        this.goods = goods;
         setResizable(false);
         setVisible(true);
     }
 
+    private void fillSuppliers(){
+        suppliers = new ConnectionProvider().getSuppliers();
+        if(suppliers != null && suppliers.size() > 0){
+            for(Supplier supplier : suppliers){
+                String item = supplier.getName();
+                cmbSupplier.addItem(item);
+            }
+        }
+    }
+    
+    private void fillShippers(){
+        shippers = new ConnectionProvider().getShippers();
+        if(shippers != null && shippers.size() > 0){
+            for(Shipper shipper : shippers){
+                String item = shipper.getName();
+                cmbShipper.addItem(item);
+            }
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -49,9 +84,6 @@ public class ArrivalOfGoodsDialog extends javax.swing.JDialog {
         txtGoodsQuantity = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         txtGoodsPrice = new javax.swing.JTextField();
-        jLabel6 = new javax.swing.JLabel();
-        txtGoodsValue = new javax.swing.JTextField();
-        jSeparator1 = new javax.swing.JSeparator();
         btnConfirm = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
@@ -59,7 +91,7 @@ public class ArrivalOfGoodsDialog extends javax.swing.JDialog {
         cmbSupplier = new javax.swing.JComboBox<>();
         lblSupplierName = new javax.swing.JLabel();
         lblSupplierPhone = new javax.swing.JLabel();
-        lblSuppierEmail = new javax.swing.JLabel();
+        lblSupplierEmail = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         jSeparator3 = new javax.swing.JSeparator();
         cmbShipper = new javax.swing.JComboBox<>();
@@ -67,6 +99,13 @@ public class ArrivalOfGoodsDialog extends javax.swing.JDialog {
         lblShipperPhone = new javax.swing.JLabel();
         lblShipperEmail = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        lblGoodsNameIncorrect = new javax.swing.JLabel();
+        lblGoodsCodeIncorrect = new javax.swing.JLabel();
+        lblGoodsQuantityIncorrect = new javax.swing.JLabel();
+        lblGoodsPriceIncorrect = new javax.swing.JLabel();
+        jSeparator4 = new javax.swing.JSeparator();
+        lblSupplierWarning = new javax.swing.JLabel();
+        lblShipperWarning = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -75,19 +114,34 @@ public class ArrivalOfGoodsDialog extends javax.swing.JDialog {
 
         jLabel2.setText("Name");
 
+        txtGoodsName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtGoodsNameKeyTyped(evt);
+            }
+        });
+
         jLabel3.setText("Code");
+
+        txtGoodsCode.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtGoodsCodeKeyTyped(evt);
+            }
+        });
 
         jLabel4.setText("Quantity");
 
         jLabel5.setText("Price p. unit");
-
-        jLabel6.setText("Value");
 
         btnConfirm.setText("Confirm");
         btnConfirm.setMargin(new java.awt.Insets(2, 2, 2, 2));
         btnConfirm.setMaximumSize(new java.awt.Dimension(70, 23));
         btnConfirm.setMinimumSize(new java.awt.Dimension(70, 23));
         btnConfirm.setPreferredSize(new java.awt.Dimension(70, 23));
+        btnConfirm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConfirmActionPerformed(evt);
+            }
+        });
 
         btnCancel.setText("Cancel");
         btnCancel.setMargin(new java.awt.Insets(2, 2, 2, 2));
@@ -106,155 +160,340 @@ public class ArrivalOfGoodsDialog extends javax.swing.JDialog {
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel8.setText("Supplier");
 
-        cmbSupplier.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbSupplier.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Choose" }));
+        cmbSupplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbSupplierActionPerformed(evt);
+            }
+        });
 
-        lblSupplierName.setText("Supplier Name");
+        lblSupplierName.setText("Name: ");
 
-        lblSupplierPhone.setText("Supplier Phone");
+        lblSupplierPhone.setText("Phone: ");
 
-        lblSuppierEmail.setText("Supplier Email");
+        lblSupplierEmail.setText("Email:");
 
-        cmbShipper.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbShipper.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Choose" }));
+        cmbShipper.setMaximumSize(new java.awt.Dimension(200, 300));
+        cmbShipper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbShipperActionPerformed(evt);
+            }
+        });
 
-        lblShipperName.setText("Shipper name");
+        lblShipperName.setText("Name: ");
 
-        lblShipperPhone.setText("Shipper Phone");
+        lblShipperPhone.setText("Phone: ");
 
-        lblShipperEmail.setText("Shipper Email");
+        lblShipperEmail.setText("Email: ");
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel9.setText("Shipper");
+
+        lblGoodsNameIncorrect.setForeground(new java.awt.Color(255, 0, 0));
+        lblGoodsNameIncorrect.setText(" ");
+
+        lblGoodsCodeIncorrect.setForeground(new java.awt.Color(255, 0, 0));
+        lblGoodsCodeIncorrect.setText(" ");
+
+        lblGoodsQuantityIncorrect.setForeground(new java.awt.Color(255, 0, 0));
+        lblGoodsQuantityIncorrect.setText(" ");
+
+        lblGoodsPriceIncorrect.setForeground(new java.awt.Color(255, 0, 0));
+        lblGoodsPriceIncorrect.setText(" ");
+
+        lblSupplierWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblSupplierWarning.setText(" ");
+
+        lblShipperWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblShipperWarning.setText(" ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(33, 33, 33)
+                        .addComponent(jLabel7))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(42, 42, 42)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(42, 42, 42)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(layout.createSequentialGroup()
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(jLabel2)
                                             .addComponent(jLabel4)
                                             .addComponent(jLabel3)
                                             .addComponent(jLabel5))
                                         .addGap(31, 31, 31)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                             .addComponent(txtGoodsName, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(txtGoodsQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(txtGoodsCode, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(txtGoodsPrice, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel6)
-                                        .addGap(62, 62, 62)
-                                        .addComponent(txtGoodsValue, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jSeparator1))
-                                .addGap(34, 34, 34))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addGap(33, 33, 33)
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 14, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel8)
-                                .addGap(38, 38, 38)
-                                .addComponent(cmbSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(82, 82, 82))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblSupplierName)
-                                .addComponent(lblSupplierPhone)
-                                .addComponent(lblSuppierEmail)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(43, 43, 43)
-                                    .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(27, 27, 27)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblShipperName)
-                                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblShipperPhone)
-                                    .addComponent(lblShipperEmail)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jLabel9)
-                                .addGap(41, 41, 41)
-                                .addComponent(cmbShipper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(81, 81, 81))))
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(lblGoodsPriceIncorrect, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblGoodsNameIncorrect, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblGoodsCodeIncorrect, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblGoodsQuantityIncorrect, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jLabel8)
+                            .addGap(28, 28, 28)
+                            .addComponent(cmbSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jSeparator2)
+                        .addComponent(lblSupplierPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblSupplierEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblSupplierName, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblSupplierWarning, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblShipperWarning, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jSeparator3)
+                        .addComponent(lblShipperPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblShipperName, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jLabel9)
+                            .addGap(34, 34, 34)
+                            .addComponent(cmbShipper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(lblShipperEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(46, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
-                        .addComponent(jLabel1)))
-                .addContainerGap(24, Short.MAX_VALUE))
+                        .addContainerGap()
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(328, 328, 328)
+                        .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(43, 43, 43)
+                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
+                .addContainerGap()
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
+                .addGap(26, 26, 26)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel7)
-                            .addComponent(jLabel8)
-                            .addComponent(cmbSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(txtGoodsName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblSupplierName))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(txtGoodsCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblSupplierPhone)
-                            .addComponent(lblShipperPhone))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(txtGoodsQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblSuppierEmail)
-                            .addComponent(lblShipperEmail))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel5)
-                            .addComponent(txtGoodsPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel9)
                             .addComponent(cmbShipper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addComponent(lblShipperName)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 238, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel2)
+                                    .addComponent(txtGoodsName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblSupplierName)
+                                    .addComponent(lblShipperName))
+                                .addGap(3, 3, 3)
+                                .addComponent(lblGoodsNameIncorrect)
+                                .addGap(1, 1, 1)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel3)
+                                    .addComponent(txtGoodsCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblSupplierPhone)
+                                    .addComponent(lblShipperPhone))
+                                .addGap(5, 5, 5)
+                                .addComponent(lblGoodsCodeIncorrect)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel4)
+                                    .addComponent(txtGoodsQuantity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblSupplierEmail)
+                                    .addComponent(lblShipperEmail))
+                                .addGap(1, 1, 1)
+                                .addComponent(lblGoodsQuantityIncorrect)
+                                .addGap(3, 3, 3)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel5)
+                                    .addComponent(txtGoodsPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblSupplierWarning)
+                                    .addComponent(lblShipperWarning))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblGoodsPriceIncorrect))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel8)
+                                .addComponent(cmbSupplier, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(txtGoodsValue, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 44, Short.MAX_VALUE)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(45, 45, 45))
+                .addGap(34, 34, 34))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        this.dispose();
+        dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
+    private void cmbSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSupplierActionPerformed
+        int index = cmbSupplier.getSelectedIndex();
+        lblSupplierName.setText("Name: ");
+        lblSupplierPhone.setText("Phone: ");
+        lblSupplierEmail.setText("Email: ");
+        if (index > 0) {
+            Supplier selectedSupplier = suppliers.get(index - 1);
+            supplierID = selectedSupplier.getId();
+            Supplier supplier = new ConnectionProvider().getSupplierByID(supplierID);
+            lblSupplierName.setText("Name: " + supplier.getName());
+            lblSupplierPhone.setText("Phone: " + supplier.getPhoneNum());
+            lblSupplierEmail.setText("Email: " + supplier.getEmail());
+        }
+    }//GEN-LAST:event_cmbSupplierActionPerformed
+
+    private void cmbShipperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbShipperActionPerformed
+        int index = cmbShipper.getSelectedIndex();
+        lblShipperName.setText("Name: ");
+        lblShipperPhone.setText("Phone: ");
+        lblShipperEmail.setText("Email: ");
+        if (index > 0) {
+            Shipper selectedShipper = shippers.get(index - 1);
+            shipperID = selectedShipper.getId();
+            Shipper shipper = new ConnectionProvider().getShipperByID(shipperID);
+            lblShipperName.setText("Name: " + shipper.getName());
+            lblShipperPhone.setText("Phone: " + shipper.getPhoneNum());
+            lblShipperEmail.setText("Email: " + shipper.getEmail());
+        }
+    }//GEN-LAST:event_cmbShipperActionPerformed
+
+    private void txtGoodsNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtGoodsNameKeyTyped
+        if(txtGoodsName.getText().length() >= 100){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtGoodsNameKeyTyped
+
+    private void txtGoodsCodeKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtGoodsCodeKeyTyped
+        if(txtGoodsCode.getText().length() >= 10){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtGoodsCodeKeyTyped
+
+    private void btnConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmActionPerformed
+        InputCheck inputCheck = new InputCheck();
+        int[] correctInputs = new int[6];
+        int supplierIndex = cmbSupplier.getSelectedIndex();
+        int shipperIndex = cmbShipper.getSelectedIndex();
+        String nameOfGoods = "";
+        String codeOfGoods = "";
+        double pricePerUnit = 0;
+        int quantity = 0;
+        
+        if(!inputCheck.isInputLengthCorrect(txtGoodsName.getText().trim(), 100, 2)){
+            lblGoodsNameIncorrect.setText("Goods name length incorrect!");
+            correctInputs[0] = 0;
+        }else{
+            lblGoodsNameIncorrect.setText(" ");
+            nameOfGoods = txtGoodsName.getText().trim();
+            correctInputs[0] = 1;
+        }
+        
+        if(!inputCheck.isInputLengthCorrect(txtGoodsCode.getText().trim(), 10, 2)){
+            lblGoodsCodeIncorrect.setText("Code length incorrect!");
+            correctInputs[1] = 0;
+        }else{
+            lblGoodsCodeIncorrect.setText(" ");
+            codeOfGoods = txtGoodsCode.getText().trim();
+            correctInputs[1] = 1;
+        }
+        
+        if(!inputCheck.isInt(txtGoodsQuantity.getText().trim())){
+            lblGoodsQuantityIncorrect.setText("Incorrect input!");
+            correctInputs[2] = 0;
+        }else{
+            lblGoodsQuantityIncorrect.setText(" ");
+            quantity = Integer.parseInt(txtGoodsQuantity.getText().trim());
+            correctInputs[2] = 1;
+        }
+        
+        if(!inputCheck.isDouble(txtGoodsPrice.getText().trim())){
+            lblGoodsPriceIncorrect.setText("Incorrect input!");
+            correctInputs[3] = 0;
+        }else{
+            Double value = Double.parseDouble(txtGoodsPrice.getText().trim());
+            if(inputCheck.hasNumberSurpassedDecimalPoint(value, 2)){
+                lblGoodsPriceIncorrect.setText("Too many decimal points!");
+                correctInputs[3] = 0;
+            }else{
+                lblGoodsPriceIncorrect.setText(" ");
+                pricePerUnit = value;
+                correctInputs[3] = 1;
+            }
+        }
+        
+        if(supplierIndex <= 0){
+            lblSupplierWarning.setText("Choose supplier!");
+            correctInputs[4] = 0;
+        }else{
+            lblSupplierWarning.setText(" ");
+            correctInputs[4] = 1;
+        }
+        
+        if(shipperIndex <= 0){
+            lblShipperWarning.setText("Choose shipper!");
+            correctInputs[5] = 0;
+        }else{
+            lblShipperWarning.setText(" ");
+            correctInputs[5] = 1;
+        }
+        
+        int sum = 0;
+        for(int i : correctInputs){
+            sum += i;
+        }
+        if(sum == 6){
+            ConnectionProvider conn = new ConnectionProvider();
+            if(isGoodsAlreadyInStock()){
+                conn.updateGoodsQuantity(idOfNewGoods, quantity, '+');
+            }else{
+                idOfNewGoods = conn.addNewGoods(nameOfGoods, codeOfGoods, quantity, pricePerUnit);
+            }
+            int idArrival = -1;
+            
+            idArrival = conn.addNewArrival(supplierID, shipperID, userID);
+            conn.addArrivalDetails(idArrival, idOfNewGoods, quantity);
+            JOptionPane.showMessageDialog(null, "Arrival of goods added!");
+            this.dispose();
+        }
+        
+        
+    }//GEN-LAST:event_btnConfirmActionPerformed
+
+    private boolean isGoodsAlreadyInStock(){
+        String name = txtGoodsName.getText().trim();
+        String code = txtGoodsCode.getText().trim();
+        Float price = Float.parseFloat(txtGoodsPrice.getText().trim());
+        for(Goods oneGoods : goods){
+            if(oneGoods.getName().equals(name.trim()) && oneGoods.getCode().equals(code) && oneGoods.getPricePerUnit() == price){
+                idOfNewGoods = oneGoods.getId();
+                return true;
+            }
+        }
+        return false;
+    }
     
     
 
@@ -268,24 +507,28 @@ public class ArrivalOfGoodsDialog extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPopupMenu jPopupMenu1;
-    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JLabel lblGoodsCodeIncorrect;
+    private javax.swing.JLabel lblGoodsNameIncorrect;
+    private javax.swing.JLabel lblGoodsPriceIncorrect;
+    private javax.swing.JLabel lblGoodsQuantityIncorrect;
     private javax.swing.JLabel lblShipperEmail;
     private javax.swing.JLabel lblShipperName;
     private javax.swing.JLabel lblShipperPhone;
-    private javax.swing.JLabel lblSuppierEmail;
+    private javax.swing.JLabel lblShipperWarning;
+    private javax.swing.JLabel lblSupplierEmail;
     private javax.swing.JLabel lblSupplierName;
     private javax.swing.JLabel lblSupplierPhone;
+    private javax.swing.JLabel lblSupplierWarning;
     private javax.swing.JTextField txtGoodsCode;
     private javax.swing.JTextField txtGoodsName;
     private javax.swing.JTextField txtGoodsPrice;
     private javax.swing.JTextField txtGoodsQuantity;
-    private javax.swing.JTextField txtGoodsValue;
     // End of variables declaration//GEN-END:variables
 }

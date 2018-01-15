@@ -6,8 +6,13 @@
 package gui.dialogs;
 
 import database.ConnectionProvider;
+import errorChecking.InputCheck;
+import inventorydatabase.Customer;
 import inventorydatabase.Goods;
+import inventorydatabase.Shipper;
+import java.awt.Dimension;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -17,18 +22,26 @@ import javax.swing.table.TableColumn;
  */
 public class ShipGoodsDialog extends javax.swing.JDialog {
 
+    private List<Customer> customers;
+    private List<Shipper> shippers;
+    private int customerID;
+    private int shipperID;
+    private int userID;
     private List<Goods> goods;
-    /**
-     * Creates new form ShipGoodsDialog
-     */
-    public ShipGoodsDialog(java.awt.Frame parent, boolean modal) {
+    
+    public ShipGoodsDialog(java.awt.Frame parent, boolean modal, int userID, List<Goods> goods) {
         super(parent, modal);
         initComponents();
-        setLocationRelativeTo(null);
-        setTitle("Shipping");
-        hideColumn(4);
-        fillListWithGoods();
+        this.goods = goods;
+        this.userID = userID;
         fillTable();
+        hideColumn(4);
+        fillCustomers();
+        cmbCustomer.setPreferredSize(new Dimension(150,25));
+        fillShippers();
+        cmbShipper.setPreferredSize(new Dimension(150,25));
+        setLocationRelativeTo(null);
+        setTitle("Shipping goods");
         setVisible(true);
     }
 
@@ -41,244 +54,339 @@ public class ShipGoodsDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        cmbShipper = new javax.swing.JComboBox<>();
-        lblShipperName = new javax.swing.JLabel();
-        lblShipperPhone = new javax.swing.JLabel();
-        lblShipperEmail = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        btnConfirm = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tableGoods = new javax.swing.JTable();
+        lblCustomerWarning = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         cmbCustomer = new javax.swing.JComboBox<>();
         lblCustomerName = new javax.swing.JLabel();
         lblCustomerPhone = new javax.swing.JLabel();
         lblCustomerEmail = new javax.swing.JLabel();
-        jSeparator2 = new javax.swing.JSeparator();
-        jLabel1 = new javax.swing.JLabel();
-        jSeparator3 = new javax.swing.JSeparator();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tableGoodsArrival = new javax.swing.JTable();
+        cmbShipper = new javax.swing.JComboBox<>();
+        lblShipperName = new javax.swing.JLabel();
+        lblShipperPhone = new javax.swing.JLabel();
+        lblShipperEmail = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        lblShipperWarning = new javax.swing.JLabel();
+        btnConfirm = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
+        lblGoodsQuantityWarning = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        cmbShipper.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        jLabel2.setText("Shipping Goods");
 
-        lblShipperName.setText("Shipper name");
-
-        lblShipperPhone.setText("Shipper Phone");
-
-        lblShipperEmail.setText("Shipper Email");
-
-        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel9.setText("Shipper");
-
-        btnConfirm.setText("Confirm");
-        btnConfirm.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        btnConfirm.setMaximumSize(new java.awt.Dimension(70, 23));
-        btnConfirm.setMinimumSize(new java.awt.Dimension(70, 23));
-        btnConfirm.setPreferredSize(new java.awt.Dimension(70, 23));
-
-        btnCancel.setText("Cancel");
-        btnCancel.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        btnCancel.setMaximumSize(new java.awt.Dimension(70, 23));
-        btnCancel.setMinimumSize(new java.awt.Dimension(70, 23));
-        btnCancel.setPreferredSize(new java.awt.Dimension(70, 23));
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
-            }
-        });
-
-        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel7.setText("Goods information");
-
-        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel8.setText("Customer");
-
-        cmbCustomer.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        lblCustomerName.setText("Supplier Name");
-
-        lblCustomerPhone.setText("Supplier Phone");
-
-        lblCustomerEmail.setText("Supplier Email");
-
-        jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-        jLabel1.setText("Goods Shipping");
-
-        tableGoodsArrival.setModel(new javax.swing.table.DefaultTableModel(
+        tableGoods.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Name", "Code", "Stock", "Quantity", "id"
+                "Name", "Code", "Quantity", "Price per unit", "id"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, true, false
+                false, false, true, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tableGoodsArrival);
-        if (tableGoodsArrival.getColumnModel().getColumnCount() > 0) {
-            tableGoodsArrival.getColumnModel().getColumn(0).setResizable(false);
-            tableGoodsArrival.getColumnModel().getColumn(1).setResizable(false);
-            tableGoodsArrival.getColumnModel().getColumn(2).setResizable(false);
-            tableGoodsArrival.getColumnModel().getColumn(3).setResizable(false);
-            tableGoodsArrival.getColumnModel().getColumn(4).setResizable(false);
-        }
+        jScrollPane1.setViewportView(tableGoods);
+
+        lblCustomerWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblCustomerWarning.setText(" ");
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel8.setText("Customer");
+
+        cmbCustomer.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Choose" }));
+        cmbCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbCustomerActionPerformed(evt);
+            }
+        });
+
+        lblCustomerName.setText("Name: ");
+
+        lblCustomerPhone.setText("Phone: ");
+
+        lblCustomerEmail.setText("Email:");
+
+        cmbShipper.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Choose" }));
+        cmbShipper.setMaximumSize(new java.awt.Dimension(200, 300));
+        cmbShipper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbShipperActionPerformed(evt);
+            }
+        });
+
+        lblShipperName.setText("Name: ");
+
+        lblShipperPhone.setText("Phone: ");
+
+        lblShipperEmail.setText("Email: ");
+
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel9.setText("Shipper");
+
+        lblShipperWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblShipperWarning.setText(" ");
+
+        btnConfirm.setText("Confirm");
+        btnConfirm.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        btnConfirm.setMaximumSize(new java.awt.Dimension(70, 23));
+        btnConfirm.setMinimumSize(new java.awt.Dimension(70, 23));
+        btnConfirm.setPreferredSize(new java.awt.Dimension(70, 23));
+        btnConfirm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConfirmActionPerformed(evt);
+            }
+        });
+
+        btnCancel.setText("Cancel");
+        btnCancel.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+
+        lblGoodsQuantityWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblGoodsQuantityWarning.setText(" ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(47, 47, 47)
+                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(280, 280, 280))
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(33, 33, 33)
-                        .addComponent(jLabel7))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
-                        .addComponent(jLabel1)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(30, 30, 30)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblGoodsQuantityWarning, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 411, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel8)
-                                .addGap(31, 31, 31)
+                                .addGap(28, 28, 28)
                                 .addComponent(cmbCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblCustomerPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCustomerEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCustomerName, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCustomerWarning, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblShipperWarning, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblShipperPhone, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblShipperName, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(8, 8, 8)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblCustomerPhone)
-                                    .addComponent(lblCustomerName)
-                                    .addComponent(lblCustomerEmail))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(8, 8, 8)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblShipperName)
-                                    .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblShipperPhone)
-                                    .addComponent(lblShipperEmail)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel9)
-                                .addGap(41, 41, 41)
-                                .addComponent(cmbShipper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(81, 81, 81)))
-                        .addGap(28, 28, 28))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(43, 43, 43)
-                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(173, 173, 173))))
+                                .addGap(34, 34, 34)
+                                .addComponent(cmbShipper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblShipperEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(98, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addGap(21, 21, 21)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(13, 13, 13)
+                        .addComponent(lblGoodsQuantityWarning))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                            .addComponent(jLabel9)
-                                            .addComponent(cmbShipper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGap(18, 18, 18)
-                                        .addComponent(lblShipperName))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(70, 70, 70)
-                                        .addComponent(lblShipperPhone)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(lblShipperEmail)))
-                                .addGap(26, 26, 26)
-                                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel8)
-                                    .addComponent(cmbCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(18, 18, 18)
+                                .addGap(35, 35, 35)
                                 .addComponent(lblCustomerName)
                                 .addGap(18, 18, 18)
                                 .addComponent(lblCustomerPhone)
+                                .addGap(25, 25, 25)
+                                .addComponent(lblCustomerEmail))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jLabel8)
+                                .addComponent(cmbCustomer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(7, 7, 7)
+                        .addComponent(lblCustomerWarning)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel9)
+                                    .addComponent(cmbShipper, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(111, 111, 111))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(35, 35, 35)
+                                .addComponent(lblShipperName)
                                 .addGap(18, 18, 18)
-                                .addComponent(lblCustomerEmail)
-                                .addGap(26, 26, 26)
-                                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(41, 41, 41)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(32, Short.MAX_VALUE))
+                                .addComponent(lblShipperPhone)
+                                .addGap(25, 25, 25)
+                                .addComponent(lblShipperEmail)))
+                        .addComponent(lblShipperWarning)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCancel))
+                .addGap(43, 43, 43))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        this.dispose();
-    }//GEN-LAST:event_btnCancelActionPerformed
-
-    private void fillTable(){
-        if(goods.isEmpty()){
-            fillListWithGoods();
-        }else{
-            goods.removeAll(goods);
-            fillListWithGoods();
+    private void fillCustomers(){
+        customers = new ConnectionProvider().getCustomers();
+        if(customers != null && customers.size() > 0){
+            for(Customer customer : customers){
+                String item = customer.getName();
+                cmbCustomer.addItem(item);
+            }
         }
-        
-        DefaultTableModel model = (DefaultTableModel) tableGoodsArrival.getModel();
+    }
+    
+    private void fillShippers(){
+        shippers = new ConnectionProvider().getShippers();
+        if(shippers != null && shippers.size() > 0){
+            for(Shipper shipper : shippers){
+                String item = shipper.getName();
+                cmbShipper.addItem(item);
+            }
+        }
+    }
+    
+    private void hideColumn(int columnIndex){
+        TableColumn tableColumnID = tableGoods.getColumnModel().getColumn(columnIndex);
+        tableColumnID.setMinWidth(0);
+        tableColumnID.setMaxWidth(0);
+        tableColumnID.setWidth(0);
+    }
+    
+    private void fillTable(){
+        DefaultTableModel model = (DefaultTableModel) tableGoods.getModel();
 
         int rowCount = model.getRowCount();
         for (int i = rowCount - 1; i >= 0; i--) {
             model.removeRow(i);
         }
         
-        for (Goods goods : goods) {
+        for (Goods tempGoods : goods) {
             Object[] o = new Object[5];
-            o[0] = goods.getName();
-            o[1] = goods.getCode();
-            o[2] = goods.getQuantity();
-            o[3] = 0;
-            o[4] = goods.getId();
+            o[0] = tempGoods.getName();
+            o[1] = tempGoods.getCode();
+            o[2] = tempGoods.getQuantity();
+            o[3] = tempGoods.getPricePerUnit();
+            o[4] = tempGoods.getId();
             model.addRow(o);
         }
+    }
+    
+    private void cmbCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbCustomerActionPerformed
+        int index = cmbCustomer.getSelectedIndex();
+        lblCustomerName.setText("Name: ");
+        lblCustomerPhone.setText("Phone: ");
+        lblCustomerEmail.setText("Email: ");
+        if (index > 0) {
+            Customer selectedCustomer = customers.get(index - 1);
+            customerID = selectedCustomer.getId();
+            Customer customer = new ConnectionProvider().getCustomerByID(customerID);
+            lblCustomerName.setText("Name: " + customer.getName());
+            lblCustomerPhone.setText("Phone: " + customer.getPhoneNum());
+            lblCustomerEmail.setText("Email: " + customer.getEmail());
+        }
+    }//GEN-LAST:event_cmbCustomerActionPerformed
+
+    private void cmbShipperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbShipperActionPerformed
+        int index = cmbShipper.getSelectedIndex();
+        lblShipperName.setText("Name: ");
+        lblShipperPhone.setText("Phone: ");
+        lblShipperEmail.setText("Email: ");
+        if (index > 0) {
+            Shipper selectedShipper = shippers.get(index - 1);
+            shipperID = selectedShipper.getId();
+            Shipper shipper = new ConnectionProvider().getShipperByID(shipperID);
+            lblShipperName.setText("Name: " + shipper.getName());
+            lblShipperPhone.setText("Phone: " + shipper.getPhoneNum());
+            lblShipperEmail.setText("Email: " + shipper.getEmail());
+        }
+    }//GEN-LAST:event_cmbShipperActionPerformed
+
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        dispose();
+    }//GEN-LAST:event_btnCancelActionPerformed
+
+    private void btnConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmActionPerformed
+        int customerIndex = cmbCustomer.getSelectedIndex();
+        int shipperIndex = cmbShipper.getSelectedIndex();
+        String quantity = tableGoods.getValueAt(tableGoods.getSelectedRow(), 2).toString();
+        int selectedTableGoodsID = Integer.parseInt(tableGoods.getValueAt(tableGoods.getSelectedRow(), 4).toString());
+        int realQuantity = findRealQuantityOfGoods(selectedTableGoodsID);
+        int quantityFromTable = 0;
+        int[] correctInputs = new int[3];
+        InputCheck inputCheck = new InputCheck();
         
-    }
-    
-    private void fillListWithGoods(){
-        ConnectionProvider conn = new ConnectionProvider();
-        goods = conn.getGoods();
-    }
-    
-    private void hideColumn(int columnIndex){
-        TableColumn tableColumn = tableGoodsArrival.getColumnModel().getColumn(columnIndex);
-        hideColumn(tableColumn);
-    }
-    private void hideColumn(TableColumn tableColumn){
-        tableColumn.setMinWidth(0);
-        tableColumn.setMaxWidth(0);
-        tableColumn.setWidth(0);
+        if(!inputCheck.isInt(quantity)){
+            lblGoodsQuantityWarning.setText("Only numbers are allowed!");
+            correctInputs[0] = 0;
+        }else{
+            quantityFromTable = Integer.parseInt(quantity);
+            if(quantityFromTable > realQuantity || quantityFromTable == 0){
+                lblGoodsQuantityWarning.setText("Not enough goods in stock!");
+                correctInputs[0] = 0;
+            }else{
+                lblGoodsQuantityWarning.setText(" ");
+                correctInputs[0] = 1;
+            }
+        }
+        
+        if(customerIndex <= 0){
+            lblCustomerWarning.setText("Choose customer!");
+            correctInputs[1] = 0;
+        }else{
+            lblCustomerWarning.setText(" ");
+            correctInputs[1] = 1;
+        }
+        
+        if(shipperIndex <= 0){
+            lblShipperWarning.setText("Choose shipper!");
+            correctInputs[2] = 0;
+        }else{
+            lblShipperWarning.setText(" ");
+            correctInputs[2] = 1;
+        }
+        
+        int sum = 0;
+        for(int a : correctInputs){
+            sum += a;
+        }
+        if(sum == 3){
+            ConnectionProvider conn = new ConnectionProvider();
+            conn.updateGoodsQuantity(selectedTableGoodsID, quantityFromTable, '-');
+            int idExpedition = conn.addNewExpedition(customerID, shipperID, userID);
+            conn.addExpeditionDetails(idExpedition, selectedTableGoodsID, quantityFromTable);
+            JOptionPane.showMessageDialog(null, "Expedition completed!\nGood shipped!");
+            dispose();
+        }
+    }//GEN-LAST:event_btnConfirmActionPerformed
+
+    private int findRealQuantityOfGoods(int goodsID){
+        int quantity = 0;
+        for(Goods tempGoods : goods){
+            if(goodsID == tempGoods.getId()){
+                quantity = tempGoods.getQuantity();
+            }
+        }
+        return quantity;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -286,19 +394,19 @@ public class ShipGoodsDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnConfirm;
     private javax.swing.JComboBox<String> cmbCustomer;
     private javax.swing.JComboBox<String> cmbShipper;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JLabel lblCustomerEmail;
     private javax.swing.JLabel lblCustomerName;
     private javax.swing.JLabel lblCustomerPhone;
+    private javax.swing.JLabel lblCustomerWarning;
+    private javax.swing.JLabel lblGoodsQuantityWarning;
     private javax.swing.JLabel lblShipperEmail;
     private javax.swing.JLabel lblShipperName;
     private javax.swing.JLabel lblShipperPhone;
-    private javax.swing.JTable tableGoodsArrival;
+    private javax.swing.JLabel lblShipperWarning;
+    private javax.swing.JTable tableGoods;
     // End of variables declaration//GEN-END:variables
 }

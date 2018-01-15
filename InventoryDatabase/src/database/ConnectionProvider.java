@@ -5,7 +5,10 @@
  */
 package database;
 
+import inventorydatabase.Customer;
 import inventorydatabase.Goods;
+import inventorydatabase.PastArrival;
+import inventorydatabase.PastExpedition;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -15,8 +18,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import inventorydatabase.Person;
+import inventorydatabase.Shipper;
+import inventorydatabase.Supplier;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,7 +33,7 @@ public class ConnectionProvider {
     private static final String USERNAME = "root";
     //dtb pass for school computer = admin
     //dtb pass for elsewhere = ""
-    private static final String PASSWORD = "admin";
+    private static final String PASSWORD = "";
     private static final String URL = "jdbc:mysql://localhost/";
     private static final String DBNAME = "inventory";
     private static final String DRIVER = "com.mysql.jdbc.Driver";
@@ -53,7 +59,7 @@ public class ConnectionProvider {
     }
     
     public boolean isAccountPasswordValid(String username, String password) {
-        String query = "SELECT id FROM Accounts WHERE login LIKE BINARY ? AND password LIKE BINARY ?";
+        String query = "SELECT id FROM Accounts WHERE login LIKE ? AND password LIKE PASSWORD(?)";
         Connection conn = getConnection();
         if (conn != null) {
             try {
@@ -242,30 +248,539 @@ public class ConnectionProvider {
         return idAddress;
     }
     
-    public List<Goods> getShippers(){
-        String query = "SELECT * FROM Shippers";
+    public List<Supplier> getSuppliers(){
+        String query = "SELECT * FROM Suppliers";
         Connection conn = getConnection();
-        Goods goods = null;
-        List<Goods> listOfGoods = new ArrayList();
+        Supplier supplier = null;
+        List<Supplier> listOfSupplers = new ArrayList();
         if(conn != null){
             try{
                 PreparedStatement ps = conn.prepareStatement(query);
                 ResultSet rs = ps.executeQuery();
                 while(rs.next()){
-                    int goodsID = rs.getInt("id");
-                    String goodsName = rs.getString("name");
-                    String goodsCode = rs.getString("code");
-                    int goodsQuantity = rs.getInt("quantity");
-                    float goodsPricePerUnit = rs.getFloat("pricePerUnit");
-                    goods = new Goods(goodsID, goodsName, goodsCode, goodsQuantity, goodsPricePerUnit );
-                    listOfGoods.add(goods);
+                    int id = rs.getInt("id");
+                    int addressID = rs.getInt("idAddress");
+                    String name = rs.getString("name");
+                    String phone = rs.getString("phone");
+                    String email = rs.getString("email");
+                    supplier = new Supplier(id, addressID, name, phone, email);
+                    listOfSupplers.add(supplier);
                 }
                 conn.close();
-                return listOfGoods;
+                return listOfSupplers;
             }catch(SQLException ex){
                 System.out.println("Error: " + ex.toString());
             }
         }
         return null; 
     }
+    
+    public Supplier getSupplierByID(int id){
+        String query = "SELECT * FROM Suppliers WHERE id = ?";
+        Connection conn = getConnection();
+        Supplier supplier = null;
+        if (conn != null) {
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setInt(1, id);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    int addressID = rs.getInt("idAddress");
+                    String name = rs.getString("name");
+                    String phone = rs.getString("phone");
+                    String email = rs.getString("email");
+                    supplier = new Supplier(id, addressID, name, phone, email);
+                }
+                conn.close();
+            } catch (SQLException ex) {
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        
+        return supplier;
+    }
+    
+    public List<Shipper> getShippers(){
+        String query = "SELECT * FROM Shippers";
+        Connection conn = getConnection();
+        Shipper shipper = null;
+        List<Shipper> listOfShippers = new ArrayList();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    int id = rs.getInt("id");
+                    int addressID = rs.getInt("idAddress");
+                    String name = rs.getString("name");
+                    String phone = rs.getString("phone");
+                    String email = rs.getString("email");
+                    shipper = new Shipper(id, addressID, name, phone, email);
+                    listOfShippers.add(shipper);
+                }
+                conn.close();
+                return listOfShippers;
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return null; 
+    }
+    
+    public Shipper getShipperByID(int id){
+        String query = "SELECT * FROM Shippers WHERE id = ?";
+        Connection conn = getConnection();
+        Shipper shipper = null;
+        if (conn != null) {
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setInt(1, id);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    int addressID = rs.getInt("idAddress");
+                    String name = rs.getString("name");
+                    String phone = rs.getString("phone");
+                    String email = rs.getString("email");
+                    shipper = new Shipper(id, addressID, name, phone, email);
+                }
+                conn.close();
+            } catch (SQLException ex) {
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        
+        return shipper;
+    }
+    
+    public int addNewArrival(int idSup, int idShip, int idUser){
+        String query = "INSERT INTO Arrivals(idSupplier, idShipper, idUser) "
+                + "VALUES(?, ?, ?)";
+        Connection conn = getConnection();
+        int idArrival = -1;
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, idSup);
+                ps.setInt(2, idShip);
+                ps.setInt(3, idUser);
+                ps.execute();
+                
+                try(ResultSet generatedKeys = ps.getGeneratedKeys()){
+                    if(generatedKeys.next()){
+                        idArrival = generatedKeys.getInt(1);
+                        conn.close();
+                    }
+                    else{
+                        throw new SQLException("Creating new arrival failed, no ID obtained");
+                    }
+                }
+
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return idArrival;
+    }
+
+    public void addArrivalDetails(int idArrival, int idGoods, int quantity){
+        String query = "INSERT INTO ArrivalDetails(idArrival, idGoods, quantity, arrivalDate) "
+                + "VALUES(?, ?, ?, ?)";
+        Connection conn = getConnection();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ps.setInt(1, idArrival);
+                ps.setInt(2, idGoods);
+                ps.setInt(3, quantity);
+                ps.setString(4, getCurrentDateTime());
+                ps.execute();
+                conn.close();
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+    }
+    
+    public int addNewGoods(String name, String code, int quantity, double pricePerUnit){
+        String query = "INSERT INTO Goods(name, code, quantity, pricePerUnit) "
+                + "VALUES(?, ?, ?, ?)";
+        Connection conn = getConnection();
+        int idGoods = -1;
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, name);
+                ps.setString(2, code);
+                ps.setInt(3, quantity);
+                ps.setDouble(4, pricePerUnit);
+                ps.execute();
+                
+                try(ResultSet generatedKeys = ps.getGeneratedKeys()){
+                    if(generatedKeys.next()){
+                        idGoods = generatedKeys.getInt(1);
+                        conn.close();
+                    }
+                    else{
+                        throw new SQLException("Creating new arrival failed, no ID obtained");
+                    }
+                }
+
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return idGoods;
+    }  
+    
+    public void updateGoodsQuantity(int id, int quantity, char type){
+        String query = "UPDATE Goods SET quantity = quantity " + type + " ? WHERE id LIKE ?";
+        Connection conn = getConnection();
+        if (conn != null) {
+            try(PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setInt(1, quantity);
+                ps.setInt(2, id);
+                ps.execute();
+                conn.close();
+            }
+            catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+    }
+    
+    public List<Customer> getCustomers(){
+        String query = "SELECT * FROM Customers";
+        Connection conn = getConnection();
+        Customer customer = null;
+        List<Customer> listOfCustomers = new ArrayList();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    int id = rs.getInt("id");
+                    int addressID = rs.getInt("idAddress");
+                    String name = rs.getString("name");
+                    String phone = rs.getString("phone");
+                    String email = rs.getString("email");
+                    customer = new Customer(id, addressID, name, phone, email);
+                    listOfCustomers.add(customer);
+                }
+                conn.close();
+                return listOfCustomers;
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return null; 
+    }
+    
+    public Customer getCustomerByID(int id){
+        String query = "SELECT * FROM Customers WHERE id = ?";
+        Connection conn = getConnection();
+        Customer customer = null;
+        if (conn != null) {
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setInt(1, id);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    int addressID = rs.getInt("idAddress");
+                    String name = rs.getString("name");
+                    String phone = rs.getString("phone");
+                    String email = rs.getString("email");
+                    customer = new Customer(id, addressID, name, phone, email);
+                }
+                conn.close();
+            } catch (SQLException ex) {
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        
+        return customer;
+    }
+    
+    public int addNewExpedition(int idCustomer, int idShip, int idUser){
+        String query = "INSERT INTO Expeditions(idCustomer, idShipper, idUser) "
+                + "VALUES(?, ?, ?)";
+        Connection conn = getConnection();
+        int idExpedition = -1;
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, idCustomer);
+                ps.setInt(2, idShip);
+                ps.setInt(3, idUser);
+                ps.execute();
+                
+                try(ResultSet generatedKeys = ps.getGeneratedKeys()){
+                    if(generatedKeys.next()){
+                        idExpedition = generatedKeys.getInt(1);
+                        conn.close();
+                    }
+                    else{
+                        throw new SQLException("Creating new arrival failed, no ID obtained");
+                    }
+                }
+
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return idExpedition;
+    }
+
+    public void addExpeditionDetails(int idExpedition, int idGoods, int quantity){
+        String query = "INSERT INTO ExpeditionDetails(idExpedition, idGoods, quantity, expeditionDate) "
+                + "VALUES(?, ?, ?, ?)";
+        Connection conn = getConnection();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ps.setInt(1, idExpedition);
+                ps.setInt(2, idGoods);
+                ps.setInt(3, quantity);
+                ps.setString(4, getCurrentDateTime());
+                ps.execute();
+                conn.close();
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+    }
+    
+    public int addNewAccount(String login, String password){
+        String query = "INSERT INTO Accounts(login, password, dateCreated, lastPasswordChange) "
+                + "VALUES(?, PASSWORD(?), ?, ?)";
+        Connection conn = getConnection();
+        int idAccount = -1;
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, login);
+                ps.setString(2, password);
+                ps.setString(3, getCurrentDateTime());
+                ps.setString(4, getCurrentDateTime());
+                ps.execute();
+                
+                try(ResultSet generatedKeys = ps.getGeneratedKeys()){
+                    if(generatedKeys.next()){
+                        idAccount = generatedKeys.getInt(1);
+                        conn.close();
+                    }
+                    else{
+                        throw new SQLException("Creating new arrival failed, no ID obtained");
+                    }
+                }
+
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return idAccount;
+    }  
+    
+    public void addUserPersonal(int idAccount, String cardID, String firstName, String lastName, String email){
+        String query = "INSERT INTO UserPersonal(idAccount, cardId, firstName, lastName, email) "
+                + "VALUES(?, ?, ?, ?, ?)";
+        Connection conn = getConnection();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ps.setInt(1, idAccount);
+                ps.setString(2, cardID);
+                ps.setString(3, firstName);
+                ps.setString(4, lastName);
+                ps.setString(5, email);
+                ps.execute();
+                conn.close();
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+    }
+    
+    public List<Person> getPeople(){
+        String query = "SELECT * FROM UserPersonal";
+        Connection conn = getConnection();
+        Person person = null;
+        List<Person> listOfPeople = new ArrayList();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    int personID = rs.getInt("id");
+                    int personAccID = rs.getInt("idAccount");
+                    String firstName = rs.getString("firstName");
+                    String lastName = rs.getString("lastName");
+                    String email = rs.getString("email");
+                    String cardID = rs.getString("cardId");
+                    person = new Person(personID, personAccID, cardID, firstName, lastName, email);
+                    listOfPeople.add(person);
+                }
+                conn.close();
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return listOfPeople; 
+    }
+    
+    public boolean deleteUserData(int id, int idAcc) throws SQLException {
+        Connection conn = getConnection();
+        
+        String deleteUserPersonalQuery = "DELETE FROM UserPersonal WHERE id = ?";
+        String deleteAccQuery = "DELETE FROM Accounts WHERE id = ?";
+
+        if(conn != null){
+            try{
+                conn.setAutoCommit(false);
+                
+                PreparedStatement ps = conn.prepareStatement(deleteUserPersonalQuery);
+                ps.setInt(1, id);
+                ps.execute();
+                ps.close();
+                
+                ps = conn.prepareStatement(deleteAccQuery);
+                ps.setInt(1, idAcc);
+                ps.execute();
+                ps.close();
+
+                conn.commit();
+                
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+                try {
+                    System.out.print("Transaction is being rolled back.");
+                    conn.rollback();
+                    return false;
+                } catch(SQLException excep) {
+                    System.out.println("Error: " + excep.toString());
+                }
+                
+            }finally {
+                conn.setAutoCommit(true);
+                conn.close();
+                
+            }
+        }
+        return true;
+    }
+    
+    public boolean deleteBusinessPartnerData(int id, int idAddress, String businessPartner) throws SQLException {
+        Connection conn = getConnection();
+        
+        String deleteSupplierQuery = "DELETE FROM " + businessPartner + " WHERE id = ?";
+        String deleteAddressQuery = "DELETE FROM Addresses WHERE id = ?";
+
+        if(conn != null){
+            try{
+                conn.setAutoCommit(false);
+                
+                PreparedStatement ps = conn.prepareStatement(deleteSupplierQuery);
+                ps.setInt(1, id);
+                ps.execute();
+                ps.close();
+                
+                ps = conn.prepareStatement(deleteAddressQuery);
+                ps.setInt(1, idAddress);
+                ps.execute();
+                ps.close();
+
+                conn.commit();
+                
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+                try {
+                    System.out.print("Transaction is being rolled back.");
+                    conn.rollback();
+                    return false;
+                } catch(SQLException excep) {
+                    System.out.println("Error: " + excep.toString());
+                }
+            }finally {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
+        }
+        return true;
+    }
+    
+   
+    
+    public List<PastArrival> getArrivals(String datepicked) {
+        String query = "SELECT * FROM Arrivals " +
+                "INNER JOIN ArrivalDetails ON Arrivals.id = ArrivalDetails.idArrival " +
+                "INNER JOIN Goods ON Goods.id = ArrivalDetails.idGoods " +
+                "INNER JOIN Shippers ON Shippers.id = Arrivals.idShipper " +
+                "INNER JOIN Suppliers ON Suppliers.id = Arrivals.idSupplier " +
+                "INNER JOIN UserPersonal ON UserPersonal.id = Arrivals.idUser " +
+                "WHERE ArrivalDetails.arrivalDate LIKE ?";
+        Connection conn = getConnection();
+        PastArrival pastArrival = null;
+        List<PastArrival> arrivals = new ArrayList();
+        if (conn != null) {
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setString(1, datepicked);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    String goodsName = rs.getString("Goods.name");
+                    String goodsCode = rs.getString("Goods.code");
+                    int goodsQuantity = rs.getInt("Goods.quantity");
+                    float pricePerUnit = rs.getFloat("Goods.pricePerUnit");
+                    String supplierName = rs.getString("Suppliers.name");
+                    String shipperName = rs.getString("Shippers.name");
+                    String userFirstName = rs.getString("UserPersonal.firstName");
+                    String userLastName = rs.getString("UserPersonal.lastName");
+                    String userCardID = rs.getString("UserPersonal.cardId");
+
+                    pastArrival = new PastArrival(goodsName, goodsCode, goodsQuantity, pricePerUnit, supplierName, shipperName, userFirstName, userLastName, userCardID);
+                    arrivals.add(pastArrival);         
+                }
+                
+                conn.close();
+            } catch (SQLException ex) {
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return arrivals;
+    }
+    
+    public List<PastExpedition> getExpeditions(String datepicked) {
+        String query = "SELECT * FROM Expeditions " +
+                "INNER JOIN ExpeditionDetails ON Expeditions.id = ExpeditionDetails.idExpedition " +
+                "INNER JOIN Goods ON Goods.id = ExpeditionDetails.idGoods " +
+                "INNER JOIN Shippers ON Shippers.id = Expeditions.idShipper " +
+                "INNER JOIN Customers ON Customers.id = Expeditions.idCustomer " +
+                "INNER JOIN UserPersonal ON UserPersonal.id = Expeditions.idUser " +
+                "WHERE ExpeditionDetails.expeditionDate LIKE ?";
+        Connection conn = getConnection();
+        PastExpedition pastExpedition = null;
+        List<PastExpedition> expeditions = new ArrayList();
+        if (conn != null) {
+            try (PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setString(1, datepicked);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    String goodsName = rs.getString("Goods.name");
+                    String goodsCode = rs.getString("Goods.code");
+                    int goodsQuantity = rs.getInt("Goods.quantity");
+                    float pricePerUnit = rs.getFloat("Goods.pricePerUnit");
+                    String customerName = rs.getString("Customers.name");
+                    String shipperName = rs.getString("Shippers.name");
+                    String userFirstName = rs.getString("UserPersonal.firstName");
+                    String userLastName = rs.getString("UserPersonal.lastName");
+                    String userCardID = rs.getString("UserPersonal.cardId");
+
+                    pastExpedition = new PastExpedition(goodsName, goodsCode, goodsQuantity, pricePerUnit, customerName, shipperName, userFirstName, userLastName, userCardID);
+                    expeditions.add(pastExpedition);         
+                }
+                
+                conn.close();
+            } catch (SQLException ex) {
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return expeditions;
+    }
+    
+    
 }

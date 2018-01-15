@@ -10,7 +10,14 @@ import gui.dialogs.NewShipperDialog;
 import gui.dialogs.ArrivalOfGoodsDialog;
 import gui.dialogs.ShipGoodsDialog;
 import database.ConnectionProvider;
+import gui.dialogs.DelAccountDialog;
+import gui.dialogs.DelCustomerDialog;
+import gui.dialogs.DelShipperDialog;
+import gui.dialogs.DelSupplierDialog;
+import gui.dialogs.NewAccount;
 import gui.dialogs.NewSupplierDialog;
+import gui.dialogs.PastArrivalsDialog;
+import gui.dialogs.PastExpeditionsDialog;
 import inventorydatabase.Goods;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -29,6 +36,7 @@ public class MainForm extends javax.swing.JFrame {
     private Person person = null;
     private JFrame loginFrame;
     private List<Goods> goods = new ArrayList();
+    private static final String copyright = "©Jozef Bálint 2018";
     /**
      * Creates new form MainForm
      */
@@ -42,7 +50,7 @@ public class MainForm extends javax.swing.JFrame {
         this.loginFrame = loginFrame;
         getPerson();
         if(!isUserInformationPresent()){
-            JOptionPane.showMessageDialog(null, "Your account is to be empty. \nCall administrator now.", "Account error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Your account seems to be empty. \nCall administrator now.", "Account error", JOptionPane.ERROR_MESSAGE);
             dispose();
             loginFrame.setVisible(true);
         }else{
@@ -64,7 +72,7 @@ public class MainForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        jMenuItem1 = new javax.swing.JMenuItem();
         lblWelcomeUser = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         btnArrival = new javax.swing.JButton();
@@ -72,25 +80,32 @@ public class MainForm extends javax.swing.JFrame {
         lblCardID = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tableGoods = new javax.swing.JTable();
-        jLabel2 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        menuLogout = new javax.swing.JMenuItem();
+        menuExit = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
         menuAddShipper = new javax.swing.JMenuItem();
         menuAddCustomer = new javax.swing.JMenuItem();
         menuAddSupplier = new javax.swing.JMenuItem();
+        menuNewAccount = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        menuUpdateShipper = new javax.swing.JMenuItem();
+        menuUpdateCustomer = new javax.swing.JMenuItem();
+        menuUpdateSupplier = new javax.swing.JMenuItem();
+        menuUpdateAccount = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        menuDelShipper = new javax.swing.JMenuItem();
+        menuDelCustomer = new javax.swing.JMenuItem();
+        menuDelSupplier = new javax.swing.JMenuItem();
+        menuDelAccount = new javax.swing.JMenuItem();
+        History = new javax.swing.JMenu();
+        menuHistoryArrivals = new javax.swing.JMenuItem();
+        menuHistoryExpeditions = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        menuMiscAbout = new javax.swing.JMenuItem();
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 576, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 329, Short.MAX_VALUE)
-        );
+        jMenuItem1.setText("jMenuItem1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -133,7 +148,7 @@ public class MainForm extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Name", "Code", "Stock", "Price per unit", "id"
+                "Name", "Code", "Quantity", "Price per unit", "id"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -153,10 +168,29 @@ public class MainForm extends javax.swing.JFrame {
             tableGoods.getColumnModel().getColumn(4).setResizable(false);
         }
 
-        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel2.setText("Goods");
-
         jMenu1.setText("File");
+
+        menuLogout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.ALT_MASK | java.awt.event.InputEvent.CTRL_MASK));
+        menuLogout.setText("Logout");
+        menuLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuLogoutActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuLogout);
+
+        menuExit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
+        menuExit.setText("Exit");
+        menuExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuExitActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuExit);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu3.setText("New");
 
         menuAddShipper.setText("New Shipper");
         menuAddShipper.addActionListener(new java.awt.event.ActionListener() {
@@ -164,7 +198,7 @@ public class MainForm extends javax.swing.JFrame {
                 menuAddShipperActionPerformed(evt);
             }
         });
-        jMenu1.add(menuAddShipper);
+        jMenu3.add(menuAddShipper);
 
         menuAddCustomer.setText("New Customer");
         menuAddCustomer.addActionListener(new java.awt.event.ActionListener() {
@@ -172,7 +206,7 @@ public class MainForm extends javax.swing.JFrame {
                 menuAddCustomerActionPerformed(evt);
             }
         });
-        jMenu1.add(menuAddCustomer);
+        jMenu3.add(menuAddCustomer);
 
         menuAddSupplier.setText("New Supplier");
         menuAddSupplier.addActionListener(new java.awt.event.ActionListener() {
@@ -180,14 +214,104 @@ public class MainForm extends javax.swing.JFrame {
                 menuAddSupplierActionPerformed(evt);
             }
         });
-        jMenu1.add(menuAddSupplier);
+        jMenu3.add(menuAddSupplier);
 
-        jMenuBar1.add(jMenu1);
+        menuNewAccount.setText("New Account");
+        menuNewAccount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuNewAccountActionPerformed(evt);
+            }
+        });
+        jMenu3.add(menuNewAccount);
 
-        jMenu2.setText("About");
+        jMenuBar1.add(jMenu3);
 
-        jMenuItem3.setText("jMenuItem3");
-        jMenu2.add(jMenuItem3);
+        jMenu4.setText("Update");
+
+        menuUpdateShipper.setText("Update Shipper");
+        jMenu4.add(menuUpdateShipper);
+
+        menuUpdateCustomer.setText("Update Customer");
+        jMenu4.add(menuUpdateCustomer);
+
+        menuUpdateSupplier.setText("Update Supplier");
+        menuUpdateSupplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuUpdateSupplierActionPerformed(evt);
+            }
+        });
+        jMenu4.add(menuUpdateSupplier);
+
+        menuUpdateAccount.setText("Update Account");
+        jMenu4.add(menuUpdateAccount);
+
+        jMenuBar1.add(jMenu4);
+
+        jMenu5.setText("Delete");
+
+        menuDelShipper.setText("Delete Shipper");
+        menuDelShipper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuDelShipperActionPerformed(evt);
+            }
+        });
+        jMenu5.add(menuDelShipper);
+
+        menuDelCustomer.setText("Delete Customer");
+        menuDelCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuDelCustomerActionPerformed(evt);
+            }
+        });
+        jMenu5.add(menuDelCustomer);
+
+        menuDelSupplier.setText("Delete Supplier");
+        menuDelSupplier.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuDelSupplierActionPerformed(evt);
+            }
+        });
+        jMenu5.add(menuDelSupplier);
+
+        menuDelAccount.setText("Delete Account");
+        menuDelAccount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuDelAccountActionPerformed(evt);
+            }
+        });
+        jMenu5.add(menuDelAccount);
+
+        jMenuBar1.add(jMenu5);
+
+        History.setText("History");
+
+        menuHistoryArrivals.setText("Past Arrivals");
+        menuHistoryArrivals.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuHistoryArrivalsActionPerformed(evt);
+            }
+        });
+        History.add(menuHistoryArrivals);
+
+        menuHistoryExpeditions.setText("Past Expeditions");
+        menuHistoryExpeditions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuHistoryExpeditionsActionPerformed(evt);
+            }
+        });
+        History.add(menuHistoryExpeditions);
+
+        jMenuBar1.add(History);
+
+        jMenu2.setText("Miscellaneous");
+
+        menuMiscAbout.setText("About");
+        menuMiscAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuMiscAboutActionPerformed(evt);
+            }
+        });
+        jMenu2.add(menuMiscAbout);
 
         jMenuBar1.add(jMenu2);
 
@@ -201,25 +325,18 @@ public class MainForm extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(btnShip, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnArrival, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnArrival, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)))
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 597, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lblWelcomeUser))
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(lblCardID)))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(28, 28, 28)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 581, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(154, Short.MAX_VALUE))))
+                            .addComponent(lblWelcomeUser)
+                            .addComponent(lblCardID)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 549, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -228,20 +345,18 @@ public class MainForm extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(3, 3, 3)
-                        .addComponent(jLabel2)
-                        .addGap(18, 18, 18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnArrival, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnShip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(btnShip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblWelcomeUser)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblCardID)))
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -258,11 +373,13 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void btnArrivalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArrivalActionPerformed
-        ArrivalOfGoodsDialog recGoodsDia = new ArrivalOfGoodsDialog(this, true);
+        ArrivalOfGoodsDialog arrivalOfGoodsDialog = new ArrivalOfGoodsDialog(this, true, id, goods);
+        fillTable();
     }//GEN-LAST:event_btnArrivalActionPerformed
 
     private void btnShipActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShipActionPerformed
-        ShipGoodsDialog shipGoodsDialog = new ShipGoodsDialog(this, true);
+        ShipGoodsDialog shipGoodsDialog = new ShipGoodsDialog(this, true, id, goods);
+        fillTable();
     }//GEN-LAST:event_btnShipActionPerformed
 
     private void menuAddShipperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddShipperActionPerformed
@@ -276,6 +393,63 @@ public class MainForm extends javax.swing.JFrame {
     private void menuAddSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuAddSupplierActionPerformed
         NewSupplierDialog newSupplierDialog = new NewSupplierDialog(this, true);
     }//GEN-LAST:event_menuAddSupplierActionPerformed
+
+    private void menuLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLogoutActionPerformed
+        if(JOptionPane.showConfirmDialog(this, 
+           "Are you sure you want logout?", "Logout confirmation",
+           JOptionPane.YES_NO_OPTION,
+           JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+        {
+            dispose();
+            loginFrame.setVisible(true);
+        }
+    }//GEN-LAST:event_menuLogoutActionPerformed
+
+    private void menuDelSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuDelSupplierActionPerformed
+        DelSupplierDialog delSupplierDialog = new DelSupplierDialog(this, true);
+    }//GEN-LAST:event_menuDelSupplierActionPerformed
+
+    private void menuUpdateSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdateSupplierActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_menuUpdateSupplierActionPerformed
+
+    private void menuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuExitActionPerformed
+        if(JOptionPane.showConfirmDialog(this, 
+           "Are you sure you want to exit?", "Exit confirmation",
+           JOptionPane.YES_NO_OPTION,
+           JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+        {
+            System.exit(0);
+        }
+    }//GEN-LAST:event_menuExitActionPerformed
+
+    private void menuNewAccountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuNewAccountActionPerformed
+        NewAccount newAccountDialog = new NewAccount(this, true);
+    }//GEN-LAST:event_menuNewAccountActionPerformed
+
+    private void menuHistoryExpeditionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuHistoryExpeditionsActionPerformed
+        PastExpeditionsDialog pastExpeditionDialog = new PastExpeditionsDialog(this, true);
+    }//GEN-LAST:event_menuHistoryExpeditionsActionPerformed
+
+    private void menuMiscAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuMiscAboutActionPerformed
+        JOptionPane.showMessageDialog(null, copyright);
+    }//GEN-LAST:event_menuMiscAboutActionPerformed
+
+    private void menuDelShipperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuDelShipperActionPerformed
+        DelShipperDialog delShipperDialog = new DelShipperDialog(this, true);
+    }//GEN-LAST:event_menuDelShipperActionPerformed
+
+    private void menuDelAccountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuDelAccountActionPerformed
+        DelAccountDialog delAccountDialog = new DelAccountDialog(this, true, id);
+    }//GEN-LAST:event_menuDelAccountActionPerformed
+
+    private void menuHistoryArrivalsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuHistoryArrivalsActionPerformed
+        PastArrivalsDialog pastArrivalsDialog = new PastArrivalsDialog(this, true);
+    }//GEN-LAST:event_menuHistoryArrivalsActionPerformed
+
+    private void menuDelCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuDelCustomerActionPerformed
+        DelCustomerDialog delCustomerDialog = new DelCustomerDialog(this, true);
+    }//GEN-LAST:event_menuDelCustomerActionPerformed
     
     private void getPerson(){
         ConnectionProvider conn = new ConnectionProvider();
@@ -286,13 +460,14 @@ public class MainForm extends javax.swing.JFrame {
         int idAcc = person.getIdAcc();
         return idAcc != -1;
     }
-    private void hideColumn(TableColumn tableColumn){
-        tableColumn.setMinWidth(0);
-        tableColumn.setMaxWidth(0);
-        tableColumn.setWidth(0);
+    private void hideColumn(int columnIndex){
+        TableColumn tableColumnID = tableGoods.getColumnModel().getColumn(columnIndex);
+        tableColumnID.setMinWidth(0);
+        tableColumnID.setMaxWidth(0);
+        tableColumnID.setWidth(0);
     }
     /*
-    *   Fills table with goods from database
+    *   Fills table with tempGoods from database
     */
     private void fillTable(){
         if(goods.isEmpty()){
@@ -309,47 +484,59 @@ public class MainForm extends javax.swing.JFrame {
             model.removeRow(i);
         }
         
-        for (Goods goods : goods) {
+        for (Goods tempGoods : goods) {
             Object[] o = new Object[5];
-            o[0] = goods.getName();
-            o[1] = goods.getCode();
-            o[2] = goods.getQuantity();
-            o[3] = goods.getPricePerUnit();
-            o[4] = goods.getId();
+            o[0] = tempGoods.getName();
+            o[1] = tempGoods.getCode();
+            o[2] = tempGoods.getQuantity();
+            o[3] = tempGoods.getPricePerUnit();
+            o[4] = tempGoods.getId();
             model.addRow(o);
         }
         
     }
     
     /*
-    *   Fills atribute 'goods' with goods from database
+    *   Fills atribute 'tempGoods' with tempGoods from database
     */
     private void fillListWithGoods(){
         ConnectionProvider conn = new ConnectionProvider();
         goods = conn.getGoods();
     }
-    
-    private void hideColumn(int columnIndex){
-        TableColumn tableColumnID = tableGoods.getColumnModel().getColumn(columnIndex);
-        hideColumn(tableColumnID);
-    }
+   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu History;
     private javax.swing.JButton btnArrival;
     private javax.swing.JButton btnShip;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCardID;
     private javax.swing.JLabel lblWelcomeUser;
     private javax.swing.JMenuItem menuAddCustomer;
     private javax.swing.JMenuItem menuAddShipper;
     private javax.swing.JMenuItem menuAddSupplier;
+    private javax.swing.JMenuItem menuDelAccount;
+    private javax.swing.JMenuItem menuDelCustomer;
+    private javax.swing.JMenuItem menuDelShipper;
+    private javax.swing.JMenuItem menuDelSupplier;
+    private javax.swing.JMenuItem menuExit;
+    private javax.swing.JMenuItem menuHistoryArrivals;
+    private javax.swing.JMenuItem menuHistoryExpeditions;
+    private javax.swing.JMenuItem menuLogout;
+    private javax.swing.JMenuItem menuMiscAbout;
+    private javax.swing.JMenuItem menuNewAccount;
+    private javax.swing.JMenuItem menuUpdateAccount;
+    private javax.swing.JMenuItem menuUpdateCustomer;
+    private javax.swing.JMenuItem menuUpdateShipper;
+    private javax.swing.JMenuItem menuUpdateSupplier;
     private javax.swing.JTable tableGoods;
     // End of variables declaration//GEN-END:variables
 }

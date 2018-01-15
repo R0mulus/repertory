@@ -160,8 +160,7 @@ public class LoginForm extends javax.swing.JFrame {
     private void confirmLogin(){
         ConnectionProvider conn = new ConnectionProvider();
         String login = txtLogin.getText();
-        char[] arrPassword = txtPassword.getPassword();
-        String password = new String(arrPassword);
+        String password = new String(txtPassword.getPassword());
         
         if(conn.isAccountPasswordValid(login, password)){
             lblLoginWarning.setText(" ");
