@@ -7,6 +7,8 @@ package gui.dialogs;
 
 import database.ConnectionProvider;
 import errorChecking.InputCheck;
+import inventorydatabase.Shipper;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -351,100 +353,117 @@ public class NewShipperDialog extends javax.swing.JDialog {
         this.dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
 
+    
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         ConnectionProvider conn = new ConnectionProvider();
         int idAddress = -1;
         int streetNum = -1;
         int[] correctInputs = new int[9];
         inputCheck = new InputCheck();
+        String shipName = txtName.getText().trim();
+        String shipPhone = txtPhone.getText().trim();
+        String shipEmail = txtEmail.getText().trim();
+        String shipCountry = txtCountry.getText().trim();
+        String shipState = txtState.getText().trim();
+        String shipCity = txtCity.getText().trim();
+        String shipStreet = txtStreet.getText().trim();
+        String shipStreetNum = txtStreetNum.getText().trim();
+        String shipZipCode = txtZipCode.getText().trim();
         
-        if(!inputCheck.isInputLengthCorrect(txtName.getText().trim(), 300, 2)){
+        if(!inputCheck.isInputLengthCorrect(shipName, 300, 2)){
             lblIncorrectNameWarning.setText("Shipper name length incorrect!");
+            correctInputs[0] = 0;
+        }else if(inputCheck.isNameInUse(shipName, 'i')){
+            lblIncorrectNameWarning.setText("Shipper name already in use!");
             correctInputs[0] = 0;
         }else{
             lblIncorrectNameWarning.setText(" ");
             correctInputs[0] = 1;
         }
-        
-        if(!inputCheck.isInputLengthCorrect(txtPhone.getText().trim(), 20, 8) || !inputCheck.isPhoneCorrect(txtPhone.getText())){
+
+        if(!inputCheck.isInputLengthCorrect(shipPhone, 20, 8) || !inputCheck.isPhoneCorrect(shipPhone)){
             lblIncorrectPhoneWarning.setText("Phone format or length incorrect!");
+            correctInputs[1] = 0;
+        }else if(inputCheck.isPhoneInUse(shipPhone)){
+            lblIncorrectPhoneWarning.setText("Phone already in use!");
             correctInputs[1] = 0;
         }else{
             lblIncorrectPhoneWarning.setText(" ");
             correctInputs[1] = 1;
         }
-        
-        if(!inputCheck.isInputLengthCorrect(txtEmail.getText().trim(), 100, 5) || !inputCheck.isEmailCorrect(txtEmail.getText())){
+
+        if(!inputCheck.isInputLengthCorrect(shipEmail, 100, 5) || !inputCheck.isEmailCorrect(shipEmail)){
             lblIncorrectEmailWarning.setText("Email format or length incorrect!");
+            correctInputs[2] = 0;
+        }else if(!inputCheck.isEmailInDatabase(shipEmail)){
+            lblIncorrectEmailWarning.setText("Email already in use!");
             correctInputs[2] = 0;
         }else{
             lblIncorrectEmailWarning.setText(" ");
             correctInputs[2] = 1;
         }
-        
-        if(!inputCheck.isInputLengthCorrect(txtCountry.getText().trim(), 100, 2)){
+
+        if(!inputCheck.isInputLengthCorrect(shipCountry, 100, 2)){
             lblIncorrectCountryWarning.setText("Country name length incorrect!");
             correctInputs[3] = 0;
         }else{
             lblIncorrectCountryWarning.setText(" ");
             correctInputs[3] = 1;
         }
-        
-        if(!inputCheck.isInputLengthCorrect(txtState.getText().trim(), 100, 2)){
+
+        if(!inputCheck.isInputLengthCorrect(shipState, 100, 2)){
             lblIncorrectStateWarning.setText("State name length incorrect!");
             correctInputs[4] = 0;
         }else{
             lblIncorrectStateWarning.setText(" ");
             correctInputs[4] = 1;
         }
-        
-        if(!inputCheck.isInputLengthCorrect(txtCity.getText().trim(), 50, 1)){
+
+        if(!inputCheck.isInputLengthCorrect(shipCity, 50, 1)){
             lblIncorrectCityWarning.setText("City name length incorrect!");
             correctInputs[5] = 0;
         }else{
             lblIncorrectCityWarning.setText(" ");
             correctInputs[5] = 1;
         }
-        
-        if(!inputCheck.isInputLengthCorrect(txtStreet.getText().trim(), 50, 1)){
+
+        if(!inputCheck.isInputLengthCorrect(shipStreet, 50, 1)){
             lblIncorrectStreetWarning.setText("Street name length incorrect!");
             correctInputs[6] = 0;
         }else{
             lblIncorrectStreetWarning.setText(" ");
             correctInputs[6] = 1;
         }
-        
-        if(!inputCheck.isInt(txtStreetNum.getText().trim()) && !inputCheck.isInputLengthCorrect(txtStreetNum.getText().trim(), 4, 1)){
+
+        if(!inputCheck.isInt(shipStreetNum) && !inputCheck.isInputLengthCorrect(shipStreetNum, 4, 1)){
             lblIncorrectStreetNumWarning.setText("Incorrect street number!");
             correctInputs[7] = 0;
         }else{
             lblIncorrectStreetNumWarning.setText(" ");
             correctInputs[7] = 1;
         }
-        
-        if(!inputCheck.isInputLengthCorrect(txtZipCode.getText().trim(), 10, 0)){
+
+        if(!inputCheck.isInputLengthCorrect(shipZipCode, 10, 0)){
             lblIncorrectZipCodeWarning.setText("ZIP code incorrect!");
             correctInputs[8] = 0;
         }else{
             lblIncorrectZipCodeWarning.setText(" ");
             correctInputs[8] = 1;
         }
-        
+
         int sum = 0;
         for(int i : correctInputs){
             sum += i;
         }
         if(sum == 9){
             String zipCode = "";
-            if(txtZipCode.getText().trim().length() > 0){
-                zipCode = txtZipCode.getText().trim();
+            if(shipZipCode.length() > 0){
+                zipCode = shipZipCode;
             }
-            streetNum = Integer.parseInt(txtStreetNum.getText());
-            idAddress = conn.addNewAddress(txtCountry.getText().trim(), txtState.getText().trim(), zipCode, txtCity.getText().trim(), txtStreet.getText().trim(), streetNum);
-            System.out.println("address added");
-            conn.addNewShipper(idAddress, txtName.getText().trim(), txtPhone.getText().trim(), txtEmail.getText().trim());
-            System.out.println("shipper added");
-            JOptionPane.showMessageDialog(null, "Shipper '" + txtName.getText() + "' added!");
+            streetNum = Integer.parseInt(shipStreetNum);
+            idAddress = conn.addNewAddress(shipCountry, shipState, zipCode, shipCity, shipStreet, streetNum);
+            conn.addNewShipper(idAddress, shipName, shipPhone, shipEmail);
+            JOptionPane.showMessageDialog(null, "Shipper '" + shipName + "' added!");
             this.dispose();
         }
         

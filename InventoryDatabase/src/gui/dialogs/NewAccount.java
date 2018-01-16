@@ -7,6 +7,10 @@ package gui.dialogs;
 
 import database.ConnectionProvider;
 import errorChecking.InputCheck;
+import inventorydatabase.Account;
+import inventorydatabase.Person;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -15,18 +19,35 @@ import javax.swing.JOptionPane;
  */
 public class NewAccount extends javax.swing.JDialog {
 
+    private List<Person> people = new ArrayList();
+    private List<Account> accounts = new ArrayList();
     /**
      * Creates new form NewAccount
      */
     public NewAccount(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        fillPeople();
+        fillAccounts();
         setLocationRelativeTo(null);
         setTitle("Registering new account");
         setResizable(false);
         setVisible(true);
+        
     }
-
+    
+    private void fillPeople(){
+        ConnectionProvider conn = new ConnectionProvider();
+        people = conn.getPeople();
+        System.out.println(people.size());
+    }
+    
+    private void fillAccounts(){
+        ConnectionProvider conn = new ConnectionProvider();
+        accounts = conn.getAccounts();
+        System.out.println(accounts.size());
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -283,19 +304,48 @@ public class NewAccount extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_txtPassword1KeyTyped
 
+    private boolean isLoginInUse(String login){
+        for(Account acc : accounts){
+            if((acc.getLogin()).equalsIgnoreCase(login)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean isCardIDinUse(String cardID){
+        for(Person person : people){
+            if((person.getCardId()).equalsIgnoreCase(cardID)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    
     private void btnConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmActionPerformed
         InputCheck inputCheck = new InputCheck();
         int[] correctInputs = new int[7];
+        String login = txtLogin.getText().trim();
+        String password1 = new String(txtPassword1.getPassword());
+        String password2 = new String(txtPassword2.getPassword());
+        String firstName = txtFirstName.getText().trim();
+        String lastName = txtLastName.getText().trim();
+        String cardID = txtCardID.getText().trim();
+        String email = txtEmail.getText().trim();
         
-        if(!inputCheck.isInputLengthCorrect(txtLogin.getText().trim(), 20, 6)){
+        if(!inputCheck.isInputLengthCorrect(login, 20, 6)){
             lblLoginWarning.setText("Login length incorrect!");
+            correctInputs[0] = 0;
+        }else if(isLoginInUse(login)){
+            lblLoginWarning.setText("Login already in use!");
             correctInputs[0] = 0;
         }else{
             lblLoginWarning.setText(" ");
             correctInputs[0] = 1;
         }
         
-        if(!inputCheck.isPasswordStrongEnough(new String(txtPassword1.getPassword()))){
+        if(!inputCheck.isPasswordStrongEnough(password1)){
             lblPassword1Warning.setText("Only alphanumeric values between 8 to 20 characters!");
             correctInputs[1] = 0;
         }else{
@@ -303,7 +353,7 @@ public class NewAccount extends javax.swing.JDialog {
             correctInputs[1] = 1;
         }
         
-        if(!inputCheck.doPasswordsMatch(new String(txtPassword1.getPassword()), new String(txtPassword2.getPassword()))){
+        if(!inputCheck.doPasswordsMatch(password1, password2)){
             lblPassword2Warning.setText("Passwords do not match!");
             correctInputs[2] = 0;
         }else{
@@ -311,7 +361,7 @@ public class NewAccount extends javax.swing.JDialog {
             correctInputs[2] = 1;
         }
         
-        if(!inputCheck.isInputLengthCorrect(txtFirstName.getText().trim(), 20, 1)){
+        if(!inputCheck.isInputLengthCorrect(firstName, 20, 1)){
             lblFirstNameWarning.setText("Incorrect length!");
             correctInputs[3] = 0;
         }else{
@@ -319,7 +369,7 @@ public class NewAccount extends javax.swing.JDialog {
             correctInputs[3] = 1;
         }
         
-        if(!inputCheck.isInputLengthCorrect(txtLastName.getText().trim(), 20, 1)){
+        if(!inputCheck.isInputLengthCorrect(lastName, 20, 1)){
             lblLastNameWarning.setText("Incorrect length!");
             correctInputs[4] = 0;
         }else{
@@ -327,16 +377,22 @@ public class NewAccount extends javax.swing.JDialog {
             correctInputs[4] = 1;
         }
         
-        if(!inputCheck.isInputLengthCorrect(txtCardID.getText().trim(), 10, 10)){
+        if(!inputCheck.isInputLengthCorrect(cardID, 10, 10)){
             lblCardIDWarning.setText("Must be exactly 10 characters long!");
+            correctInputs[5] = 0;
+        }else if(isCardIDinUse(cardID)){
+            lblCardIDWarning.setText("Card already in use!");
             correctInputs[5] = 0;
         }else{
             lblCardIDWarning.setText(" ");
             correctInputs[5] = 1;
         }
         
-        if(!inputCheck.isEmailCorrect(txtEmail.getText().trim())){
+        if(!inputCheck.isEmailCorrect(email)){
             lblEmailWarning.setText("Incorrect email format!");
+            correctInputs[6] = 0;
+        }else if(inputCheck.isEmailInDatabase(email)){
+            lblEmailWarning.setText("Email already in use!");
             correctInputs[6] = 0;
         }else{
             lblEmailWarning.setText(" ");
@@ -349,15 +405,9 @@ public class NewAccount extends javax.swing.JDialog {
         }
         if(sum == 7){
             ConnectionProvider conn = new ConnectionProvider();
-            String password = new String(txtPassword1.getPassword());
-            String login = txtLogin.getText().trim();
-            String cardID = txtCardID.getText();
-            String firstName = txtFirstName.getText().trim();
-            String lastName = txtLastName.getText().trim();
-            String email = txtEmail.getText().trim();
-            int idAccount = conn.addNewAccount(login, password);
+            int idAccount = conn.addNewAccount(login, password1);
             conn.addUserPersonal(idAccount, cardID, firstName, lastName, email);
-            JOptionPane.showMessageDialog(null, "User " + firstName + " " + lastName + "\nwith '" + login + "' added!");
+            JOptionPane.showMessageDialog(null, "User " + firstName + " " + lastName + "\nwith '" + login + "' as login added!");
             this.dispose();
         }
     }//GEN-LAST:event_btnConfirmActionPerformed

@@ -7,6 +7,8 @@ package gui.dialogs;
 
 import database.ConnectionProvider;
 import errorChecking.InputCheck;
+import inventorydatabase.Customer;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 /**
@@ -388,38 +390,57 @@ public class NewCustomerDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_txtPhoneKeyTyped
 
+    
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         ConnectionProvider conn = new ConnectionProvider();
         int idAddress = -1;
         int streetNum = -1;
         int[] correctInputs = new int[9];
         inputCheck = new InputCheck();
-
-        if(!inputCheck.isInputLengthCorrect(txtName.getText().trim(), 300, 2)){
+        String custName = txtName.getText().trim();
+        String custPhone = txtPhone.getText().trim();
+        String custEmail = txtEmail.getText().trim();
+        String custCountry = txtCountry.getText().trim();
+        String custState = txtState.getText().trim();
+        String custCity = txtCity.getText().trim();
+        String custStreet = txtStreet.getText().trim();
+        String custStreetNum = txtStreetNum.getText().trim();
+        String custZipCode = txtZipCode.getText().trim();
+        
+        if(!inputCheck.isInputLengthCorrect(custName, 300, 2)){
             lblIncorrectNameWarning.setText("Customer name length incorrect!");
+            correctInputs[0] = 0;
+        }else if(inputCheck.isNameInUse(custName, 'c')){
+            lblIncorrectNameWarning.setText("Customer name already in use!");
             correctInputs[0] = 0;
         }else{
             lblIncorrectNameWarning.setText(" ");
             correctInputs[0] = 1;
         }
 
-        if(!inputCheck.isInputLengthCorrect(txtPhone.getText().trim(), 20, 8) || !inputCheck.isPhoneCorrect(txtPhone.getText())){
+        if(!inputCheck.isInputLengthCorrect(custPhone, 20, 8) || !inputCheck.isPhoneCorrect(custPhone)){
             lblIncorrectPhoneWarning.setText("Phone format or length incorrect!");
+            correctInputs[1] = 0;
+        }else if(inputCheck.isPhoneInUse(custPhone)){
+            lblIncorrectPhoneWarning.setText("Phone already in use!");
             correctInputs[1] = 0;
         }else{
             lblIncorrectPhoneWarning.setText(" ");
             correctInputs[1] = 1;
         }
 
-        if(!inputCheck.isInputLengthCorrect(txtEmail.getText().trim(), 100, 5) || !inputCheck.isEmailCorrect(txtEmail.getText())){
+        if(!inputCheck.isInputLengthCorrect(custEmail, 100, 5) || !inputCheck.isEmailCorrect(custEmail)){
             lblIncorrectEmailWarning.setText("Email format or length incorrect!");
+            correctInputs[2] = 0;
+        }else if(!inputCheck.isEmailInDatabase(custEmail)){
+            lblIncorrectEmailWarning.setText("Email already in use!");
             correctInputs[2] = 0;
         }else{
             lblIncorrectEmailWarning.setText(" ");
             correctInputs[2] = 1;
         }
 
-        if(!inputCheck.isInputLengthCorrect(txtCountry.getText().trim(), 100, 2)){
+        if(!inputCheck.isInputLengthCorrect(custCountry, 100, 2)){
             lblIncorrectCountryWarning.setText("Country name length incorrect!");
             correctInputs[3] = 0;
         }else{
@@ -427,7 +448,7 @@ public class NewCustomerDialog extends javax.swing.JDialog {
             correctInputs[3] = 1;
         }
 
-        if(!inputCheck.isInputLengthCorrect(txtState.getText().trim(), 100, 2)){
+        if(!inputCheck.isInputLengthCorrect(custState, 100, 2)){
             lblIncorrectStateWarning.setText("State name length incorrect!");
             correctInputs[4] = 0;
         }else{
@@ -435,7 +456,7 @@ public class NewCustomerDialog extends javax.swing.JDialog {
             correctInputs[4] = 1;
         }
 
-        if(!inputCheck.isInputLengthCorrect(txtCity.getText().trim(), 50, 1)){
+        if(!inputCheck.isInputLengthCorrect(custCity, 50, 1)){
             lblIncorrectCityWarning.setText("City name length incorrect!");
             correctInputs[5] = 0;
         }else{
@@ -443,7 +464,7 @@ public class NewCustomerDialog extends javax.swing.JDialog {
             correctInputs[5] = 1;
         }
 
-        if(!inputCheck.isInputLengthCorrect(txtStreet.getText().trim(), 50, 1)){
+        if(!inputCheck.isInputLengthCorrect(custStreet, 50, 1)){
             lblIncorrectStreetWarning.setText("Street name length incorrect!");
             correctInputs[6] = 0;
         }else{
@@ -451,7 +472,7 @@ public class NewCustomerDialog extends javax.swing.JDialog {
             correctInputs[6] = 1;
         }
 
-        if(!inputCheck.isInt(txtStreetNum.getText().trim()) && !inputCheck.isInputLengthCorrect(txtStreetNum.getText().trim(), 4, 1)){
+        if(!inputCheck.isInt(custStreetNum) && !inputCheck.isInputLengthCorrect(custStreetNum, 4, 1)){
             lblIncorrectStreetNumWarning.setText("Incorrect street number!");
             correctInputs[7] = 0;
         }else{
@@ -459,7 +480,7 @@ public class NewCustomerDialog extends javax.swing.JDialog {
             correctInputs[7] = 1;
         }
 
-        if(!inputCheck.isInputLengthCorrect(txtZipCode.getText().trim(), 10, 0)){
+        if(!inputCheck.isInputLengthCorrect(custZipCode, 10, 0)){
             lblIncorrectZipCodeWarning.setText("ZIP code incorrect!");
             correctInputs[8] = 0;
         }else{
@@ -473,13 +494,13 @@ public class NewCustomerDialog extends javax.swing.JDialog {
         }
         if(sum == 9){
             String zipCode = "";
-            if(txtZipCode.getText().trim().length() > 0){
-                zipCode = txtZipCode.getText().trim();
+            if(custZipCode.length() > 0){
+                zipCode = custZipCode;
             }
-            streetNum = Integer.parseInt(txtStreetNum.getText());
-            idAddress = conn.addNewAddress(txtCountry.getText().trim(), txtState.getText().trim(), zipCode, txtCity.getText().trim(), txtStreet.getText().trim(), streetNum);
-            conn.addNewCustomer(idAddress, txtName.getText().trim(), txtPhone.getText().trim(), txtEmail.getText().trim());
-            JOptionPane.showMessageDialog(null, "Customer '" + txtName.getText() + "' added!");
+            streetNum = Integer.parseInt(custStreetNum);
+            idAddress = conn.addNewAddress(custCountry, custState, zipCode, custCity, custStreet, streetNum);
+            conn.addNewCustomer(idAddress, custName, custPhone, custEmail);
+            JOptionPane.showMessageDialog(null, "Customer '" + custName + "' added!");
             this.dispose();
         }
 

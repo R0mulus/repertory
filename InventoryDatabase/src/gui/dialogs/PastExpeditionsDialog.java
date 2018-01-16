@@ -8,6 +8,7 @@ package gui.dialogs;
 import database.ConnectionProvider;
 import inventorydatabase.PastExpedition;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -48,13 +49,13 @@ public class PastExpeditionsDialog extends javax.swing.JDialog {
 
         datePicker = new org.jdesktop.swingx.JXDatePicker();
         jScrollPane1 = new javax.swing.JScrollPane();
-        tableArrivals = new javax.swing.JTable();
+        tableExpeditions = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         btnConfirm = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        tableArrivals.setModel(new javax.swing.table.DefaultTableModel(
+        tableExpeditions.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -70,7 +71,7 @@ public class PastExpeditionsDialog extends javax.swing.JDialog {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(tableArrivals);
+        jScrollPane1.setViewportView(tableExpeditions);
 
         jLabel1.setText("Choose date:");
 
@@ -126,28 +127,28 @@ public class PastExpeditionsDialog extends javax.swing.JDialog {
 
         Calendar today = Calendar.getInstance();
         String dateString = sdf.format(cal.getTime());
+        System.out.println(dateString);
         if(cal.compareTo(today) > 0){
             JOptionPane.showMessageDialog(rootPane, "Cannot pick future date!","Invalid date",JOptionPane.ERROR_MESSAGE);
-            fillListWithArrivals(dateString);
+            fillListWithExpeditions(dateString);
             fillTable(dateString);
         }else{
-            fillListWithArrivals(dateString);
+            fillListWithExpeditions(dateString);
             fillTable(dateString);
         }
-        
-        
 
     }//GEN-LAST:event_btnConfirmActionPerformed
 
     private void fillTable(String date){
+        
         if(expeditions.isEmpty()){
-            fillListWithArrivals(date);
+            fillListWithExpeditions(date);
         }else{
             expeditions.removeAll(expeditions);
-            fillListWithArrivals(date);
+            fillListWithExpeditions(date);
         }
         
-        DefaultTableModel model = (DefaultTableModel) tableArrivals.getModel();
+        DefaultTableModel model = (DefaultTableModel) tableExpeditions.getModel();
 
         int rowCount = model.getRowCount();
         for (int i = rowCount - 1; i >= 0; i--) {
@@ -165,14 +166,13 @@ public class PastExpeditionsDialog extends javax.swing.JDialog {
             o[6] = tempExpedition.getUserFirstName()+ " " + tempExpedition.getUserLastName();
             o[7] = tempExpedition.getUserCardID();
             model.addRow(o);
-        }
-        
+        }        
     }
 
     /*
     *   Fills atribute 'tempGoods' with tempGoods from database
     */
-    private void fillListWithArrivals(String date){
+    private void fillListWithExpeditions(String date){
         ConnectionProvider conn = new ConnectionProvider();
         expeditions = conn.getExpeditions(date);
     }
@@ -182,6 +182,6 @@ public class PastExpeditionsDialog extends javax.swing.JDialog {
     private org.jdesktop.swingx.JXDatePicker datePicker;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tableArrivals;
+    private javax.swing.JTable tableExpeditions;
     // End of variables declaration//GEN-END:variables
 }

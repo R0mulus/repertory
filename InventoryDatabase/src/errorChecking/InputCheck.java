@@ -5,7 +5,14 @@
  */
 package errorChecking;
 
+import database.ConnectionProvider;
+import inventorydatabase.Account;
+import inventorydatabase.Customer;
+import inventorydatabase.Person;
+import inventorydatabase.Shipper;
+import inventorydatabase.Supplier;
 import java.math.BigDecimal;
+import java.util.List;
 import org.apache.commons.validator.routines.EmailValidator;
 
 /**
@@ -16,8 +23,93 @@ public class InputCheck {
     
     private static final String phonePrefixPlus = "+";
     private static final String phonePrefixZeroes = "00";
+    private List<Customer> customers = null;
+    private List<Shipper> shippers = null;
+    private List<Supplier> suppliers = null;
+    private List<Person> people = null;
     
     public InputCheck(){}
+    
+    private void refreshLists(){
+        customers = null;
+        shippers = null;
+        suppliers = null;
+        people = null;
+        ConnectionProvider conn = new ConnectionProvider();
+        customers = conn.getCustomers();
+        shippers = conn.getShippers();
+        suppliers = conn.getSuppliers();
+        people = conn.getPeople();
+    }
+    
+    public boolean isEmailInDatabase(String email){
+        refreshLists();
+        for(Customer customer : customers){
+            if((customer.getName()).equalsIgnoreCase(email)){
+                return true;
+            }
+        }
+        for(Shipper shipper : shippers){
+            if((shipper.getName()).equalsIgnoreCase(email)){
+                return true;
+            }
+        }
+        for(Supplier supplier : suppliers){
+            if((supplier.getName()).equalsIgnoreCase(email)){
+                return true;
+            }
+        }
+        for(Person person : people){
+            if((person.getEmail()).equalsIgnoreCase(email)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean isNameInUse(String name, char type){
+        refreshLists();
+        switch(type){
+            case 'c':for(Customer customer : customers){
+                        if((customer.getName()).equalsIgnoreCase(name)){
+                            return true;
+                        }
+                     }return false;
+            case 'i':for(Shipper ship : shippers){
+                        if((ship.getName()).equalsIgnoreCase(name)){
+                            return true;
+                        }
+                     }
+                     return false;
+            case 'u':for(Supplier supplier : suppliers){
+                        if((supplier.getName()).equalsIgnoreCase(name)){
+                            return true;
+                        }
+                     }
+                     return false;
+            default:return true;
+        }
+    }
+    
+    public boolean isPhoneInUse(String phone){
+        refreshLists();
+        for(Customer customer : customers){
+            if((customer.getPhoneNum()).equalsIgnoreCase(phone)){
+                return true;
+            }
+        }
+        for(Shipper shipper : shippers){
+            if((shipper.getPhoneNum()).equalsIgnoreCase(phone)){
+                return true;
+            }
+        }
+        for(Supplier supplier : suppliers){
+            if((supplier.getPhoneNum()).equalsIgnoreCase(phone)){
+                return true;
+            }
+        }
+        return false;
+    }
     
     /*
     *   check if string can be parsed to integer data type
@@ -32,7 +124,6 @@ public class InputCheck {
             }
         }
         return false;
-        
     }
     
     /*

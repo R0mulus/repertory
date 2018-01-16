@@ -5,6 +5,8 @@
  */
 package database;
 
+import inventorydatabase.Account;
+import inventorydatabase.Address;
 import inventorydatabase.Customer;
 import inventorydatabase.Goods;
 import inventorydatabase.PastArrival;
@@ -446,6 +448,101 @@ public class ConnectionProvider {
         }
     }
     
+    public void updateShipper(String name, String phone, String email, int idShipper){
+        String query = "UPDATE Shippers SET name LIKE ?, phone LIKE ?, email LIKE ?"
+                + " WHERE id LIKE ?";
+        Connection conn = getConnection();
+        if (conn != null) {
+            try(PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setString(1, name);
+                ps.setString(2, phone);
+                ps.setString(3, email);
+                ps.setInt(4, idShipper);
+                ps.executeUpdate();
+                ps.close();
+                conn.close();
+            }
+            catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+    }
+    
+    public void updateAddress(int idAddress, String country, String countryState, String postalCode, String city, String street, int streetNum){
+        String query = "UPDATE Addresses SET country LIKE ?, countryState LIKE ?, postalCode LIKE ?, city LIKE ?, street LIKE ?, streetNum = ?" 
+                + " WHERE id LIKE ?";
+        Connection conn = getConnection();
+        if (conn != null) {
+            try(PreparedStatement ps = conn.prepareStatement(query)) {
+                ps.setString(1, country);
+                ps.setString(2, countryState);
+                ps.setString(3, postalCode);
+                ps.setString(4, city);
+                ps.setString(5, street);
+                ps.setInt(6, streetNum);
+                ps.setInt(7, idAddress);
+                ps.executeUpdate();
+                conn.close();
+            }
+            catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+    }
+    
+    public boolean updateBusinessPartnerWithAddress(String table, String name, String phone, String email, int idShipper, int idAddress, String country, String countryState, String postalCode, String city, String street, int streetNum) throws SQLException {
+        Connection conn = getConnection();
+        
+        String queryShipper = "UPDATE " + table + " SET name = ?,"
+                + " phone = ?,"
+                + " email = ?"
+                + " WHERE id = ?";
+        String queryAddress = "UPDATE Addresses SET country = ?, countryState = ?, postalCode = ?, city = ?, street = ?, streetNum = ?" 
+                + " WHERE id = ?";
+
+        if(conn != null){
+            try{
+                conn.setAutoCommit(false);
+                PreparedStatement ps = conn.prepareStatement(queryShipper);
+                ps.setString(1, name);
+                ps.setString(2, phone);
+                ps.setString(3, email);
+                ps.setInt(4, idShipper);
+                ps.execute();
+                ps.close();
+                
+                ps = conn.prepareStatement(queryAddress);
+                ps.setString(1, country);
+                ps.setString(2, countryState);
+                ps.setString(3, postalCode);
+                ps.setString(4, city);
+                ps.setString(5, street);
+                ps.setInt(6, streetNum);
+                ps.setInt(7, idAddress);
+                ps.execute();
+                ps.close();
+
+                conn.commit();
+                
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+                try {
+                    System.out.print("Transaction is being rolled back.");
+                    conn.rollback();
+                    return false;
+                } catch(SQLException excep) {
+                    System.out.println("Error: " + excep.toString());
+                }
+                
+            }finally {
+                conn.setAutoCommit(true);
+                conn.close();
+                
+            }
+        }
+        return true;
+    }
+    
     public List<Customer> getCustomers(){
         String query = "SELECT * FROM Customers";
         Connection conn = getConnection();
@@ -624,6 +721,60 @@ public class ConnectionProvider {
         return listOfPeople; 
     }
     
+    public List<Account> getAccounts(){
+        String query = "SELECT * FROM Accounts";
+        Connection conn = getConnection();
+        Account account = null;
+        List<Account> listOfAccounts = new ArrayList();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    int id = rs.getInt("id");
+                    String login = rs.getString("login");
+                    String password = rs.getString("password");
+                    Date dateCreated = rs.getDate("dateCreated");
+                    Date lastPasswordChange = rs.getDate("lastPasswordChange");
+                    account = new Account(id, login, password, dateCreated, lastPasswordChange);
+                    listOfAccounts.add(account);
+                }
+                conn.close();
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return listOfAccounts; 
+    }
+    
+    public List<Address> getAddresses(){
+        String query = "SELECT * FROM Addresses";
+        Connection conn = getConnection();
+        Address address = null;
+        List<Address> listOfAddress = new ArrayList();
+        if(conn != null){
+            try{
+                PreparedStatement ps = conn.prepareStatement(query);
+                ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    int addressID = rs.getInt("id");
+                    String country = rs.getString("country");
+                    String countryState = rs.getString("countryState");
+                    String postalCode = rs.getString("postalCode");
+                    String city = rs.getString("city");
+                    String street = rs.getString("street");
+                    int streetNum = rs.getInt("streetNum");
+                    address = new Address(addressID, country, countryState, postalCode, city, street, streetNum);
+                    listOfAddress.add(address);
+                }
+                conn.close();
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+            }
+        }
+        return listOfAddress;
+    }
+    
     public boolean deleteUserData(int id, int idAcc) throws SQLException {
         Connection conn = getConnection();
         
@@ -715,7 +866,7 @@ public class ConnectionProvider {
                 "INNER JOIN UserPersonal ON UserPersonal.id = Arrivals.idUser " +
                 "WHERE ArrivalDetails.arrivalDate LIKE ?";
         Connection conn = getConnection();
-        PastArrival pastArrival = null;
+        PastArrival pastArrival;
         List<PastArrival> arrivals = new ArrayList();
         if (conn != null) {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
@@ -724,13 +875,15 @@ public class ConnectionProvider {
                 while (rs.next()) {
                     String goodsName = rs.getString("Goods.name");
                     String goodsCode = rs.getString("Goods.code");
-                    int goodsQuantity = rs.getInt("Goods.quantity");
+                    int goodsQuantity = rs.getInt("ArrivalDetails.quantity");
                     float pricePerUnit = rs.getFloat("Goods.pricePerUnit");
                     String supplierName = rs.getString("Suppliers.name");
                     String shipperName = rs.getString("Shippers.name");
                     String userFirstName = rs.getString("UserPersonal.firstName");
                     String userLastName = rs.getString("UserPersonal.lastName");
                     String userCardID = rs.getString("UserPersonal.cardId");
+                    
+                    int idGoods = rs.getInt("Goods.id");
 
                     pastArrival = new PastArrival(goodsName, goodsCode, goodsQuantity, pricePerUnit, supplierName, shipperName, userFirstName, userLastName, userCardID);
                     arrivals.add(pastArrival);         
@@ -753,7 +906,7 @@ public class ConnectionProvider {
                 "INNER JOIN UserPersonal ON UserPersonal.id = Expeditions.idUser " +
                 "WHERE ExpeditionDetails.expeditionDate LIKE ?";
         Connection conn = getConnection();
-        PastExpedition pastExpedition = null;
+        PastExpedition pastExpedition;
         List<PastExpedition> expeditions = new ArrayList();
         if (conn != null) {
             try (PreparedStatement ps = conn.prepareStatement(query)) {
@@ -762,7 +915,7 @@ public class ConnectionProvider {
                 while (rs.next()) {
                     String goodsName = rs.getString("Goods.name");
                     String goodsCode = rs.getString("Goods.code");
-                    int goodsQuantity = rs.getInt("Goods.quantity");
+                    int goodsQuantity = rs.getInt("ExpeditionDetails.quantity");
                     float pricePerUnit = rs.getFloat("Goods.pricePerUnit");
                     String customerName = rs.getString("Customers.name");
                     String shipperName = rs.getString("Shippers.name");

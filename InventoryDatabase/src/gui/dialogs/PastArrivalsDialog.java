@@ -144,14 +144,12 @@ public class PastArrivalsDialog extends javax.swing.JDialog {
             arrivals.removeAll(arrivals);
             fillListWithArrivals(date);
         }
-        
         DefaultTableModel model = (DefaultTableModel) tableArrivals.getModel();
 
         int rowCount = model.getRowCount();
         for (int i = rowCount - 1; i >= 0; i--) {
             model.removeRow(i);
         }
-        
         for (PastArrival tempArrival : arrivals) {
             Object[] o = new Object[8];
             o[0] = tempArrival.getGoodsName();
@@ -164,12 +162,8 @@ public class PastArrivalsDialog extends javax.swing.JDialog {
             o[7] = tempArrival.getUserCardID();
             model.addRow(o);
         }
-        
     }
-    
-    /*
-    *   Fills atribute 'tempGoods' with tempGoods from database
-    */
+
     private void fillListWithArrivals(String date){
         ConnectionProvider conn = new ConnectionProvider();
         arrivals = conn.getArrivals(date);

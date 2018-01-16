@@ -18,6 +18,10 @@ import gui.dialogs.NewAccount;
 import gui.dialogs.NewSupplierDialog;
 import gui.dialogs.PastArrivalsDialog;
 import gui.dialogs.PastExpeditionsDialog;
+import gui.updateForms.UpdateAccountForm;
+import gui.updateForms.UpdateCustomerForm;
+import gui.updateForms.UpdateShipperForm;
+import gui.updateForms.UpdateSupplierForm;
 import inventorydatabase.Goods;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -36,6 +40,7 @@ public class MainForm extends javax.swing.JFrame {
     private Person person = null;
     private JFrame loginFrame;
     private List<Goods> goods = new ArrayList();
+    private List<Goods> goodsNoVoid = new ArrayList();
     private static final String copyright = "©Jozef Bálint 2018";
     /**
      * Creates new form MainForm
@@ -43,10 +48,9 @@ public class MainForm extends javax.swing.JFrame {
     public MainForm(int id,JFrame loginFrame) {
         initComponents();
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        setLocationRelativeTo(null);
+        
         setTitle("Stock organizer");
         this.id = id;
-        setVisible(true);
         this.loginFrame = loginFrame;
         getPerson();
         if(!isUserInformationPresent()){
@@ -61,6 +65,9 @@ public class MainForm extends javax.swing.JFrame {
         }
         hideColumn(4);
         fillTable();
+        
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     /**
@@ -229,9 +236,19 @@ public class MainForm extends javax.swing.JFrame {
         jMenu4.setText("Update");
 
         menuUpdateShipper.setText("Update Shipper");
+        menuUpdateShipper.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuUpdateShipperActionPerformed(evt);
+            }
+        });
         jMenu4.add(menuUpdateShipper);
 
         menuUpdateCustomer.setText("Update Customer");
+        menuUpdateCustomer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuUpdateCustomerActionPerformed(evt);
+            }
+        });
         jMenu4.add(menuUpdateCustomer);
 
         menuUpdateSupplier.setText("Update Supplier");
@@ -243,6 +260,11 @@ public class MainForm extends javax.swing.JFrame {
         jMenu4.add(menuUpdateSupplier);
 
         menuUpdateAccount.setText("Update Account");
+        menuUpdateAccount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuUpdateAccountActionPerformed(evt);
+            }
+        });
         jMenu4.add(menuUpdateAccount);
 
         jMenuBar1.add(jMenu4);
@@ -350,7 +372,8 @@ public class MainForm extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(btnArrival, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnShip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnShip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblWelcomeUser)
@@ -410,7 +433,7 @@ public class MainForm extends javax.swing.JFrame {
     }//GEN-LAST:event_menuDelSupplierActionPerformed
 
     private void menuUpdateSupplierActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdateSupplierActionPerformed
-        // TODO add your handling code here:
+        UpdateSupplierForm updateSupplierForm = new UpdateSupplierForm(this);
     }//GEN-LAST:event_menuUpdateSupplierActionPerformed
 
     private void menuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuExitActionPerformed
@@ -450,6 +473,18 @@ public class MainForm extends javax.swing.JFrame {
     private void menuDelCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuDelCustomerActionPerformed
         DelCustomerDialog delCustomerDialog = new DelCustomerDialog(this, true);
     }//GEN-LAST:event_menuDelCustomerActionPerformed
+
+    private void menuUpdateShipperActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdateShipperActionPerformed
+        UpdateShipperForm updateShipperForm = new UpdateShipperForm(this);
+    }//GEN-LAST:event_menuUpdateShipperActionPerformed
+
+    private void menuUpdateAccountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdateAccountActionPerformed
+        UpdateAccountForm updateAccountForm = new UpdateAccountForm(this);
+    }//GEN-LAST:event_menuUpdateAccountActionPerformed
+
+    private void menuUpdateCustomerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuUpdateCustomerActionPerformed
+        UpdateCustomerForm updateCustomerForm = new UpdateCustomerForm(this);
+    }//GEN-LAST:event_menuUpdateCustomerActionPerformed
     
     private void getPerson(){
         ConnectionProvider conn = new ConnectionProvider();
@@ -466,9 +501,7 @@ public class MainForm extends javax.swing.JFrame {
         tableColumnID.setMaxWidth(0);
         tableColumnID.setWidth(0);
     }
-    /*
-    *   Fills table with tempGoods from database
-    */
+
     private void fillTable(){
         if(goods.isEmpty()){
             fillListWithGoods();
@@ -493,12 +526,8 @@ public class MainForm extends javax.swing.JFrame {
             o[4] = tempGoods.getId();
             model.addRow(o);
         }
-        
     }
-    
-    /*
-    *   Fills atribute 'tempGoods' with tempGoods from database
-    */
+  
     private void fillListWithGoods(){
         ConnectionProvider conn = new ConnectionProvider();
         goods = conn.getGoods();
