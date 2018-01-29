@@ -5,31 +5,31 @@
  */
 package gui;
 
-import gui.dialogs.NewCustomerDialog;
-import gui.dialogs.NewShipperDialog;
-import gui.dialogs.ArrivalOfGoodsDialog;
-import gui.dialogs.ShipGoodsDialog;
 import database.ConnectionProvider;
-import gui.dialogs.DelAccountDialog;
-import gui.dialogs.DelCustomerDialog;
-import gui.dialogs.DelShipperDialog;
-import gui.dialogs.DelSupplierDialog;
-import gui.dialogs.NewAccount;
-import gui.dialogs.NewSupplierDialog;
-import gui.dialogs.PastArrivalsDialog;
-import gui.dialogs.PastExpeditionsDialog;
-import gui.updateForms.UpdateAccountForm;
-import gui.updateForms.UpdateCustomerForm;
-import gui.updateForms.UpdateShipperForm;
-import gui.updateForms.UpdateSupplierForm;
-import inventorydatabase.Goods;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import inventorydatabase.Person;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
+import inventorydatabase.Goods;
+import inventorydatabase.Person;
+import gui.dialogs.PastArrivalsDialog;
+import gui.dialogs.PastExpeditionsDialog;
+import gui.newBusinessPartAndUser.NewCustomerDialog;
+import gui.newBusinessPartAndUser.NewShipperDialog;
+import gui.newBusinessPartAndUser.NewAccount;
+import gui.newBusinessPartAndUser.NewSupplierDialog;
+import gui.deleteForms.DelAccountDialog;
+import gui.deleteForms.DelCustomerDialog;
+import gui.deleteForms.DelShipperDialog;
+import gui.deleteForms.DelSupplierDialog;
+import gui.updateForms.UpdateAccountForm;
+import gui.updateForms.UpdateCustomerForm;
+import gui.updateForms.UpdateShipperForm;
+import gui.updateForms.UpdateSupplierForm;
+import gui.dialogs.ArrivalOfGoodsDialog;
+import gui.dialogs.ShipGoodsDialog;
 
 /**
  *
@@ -48,24 +48,13 @@ public class MainForm extends javax.swing.JFrame {
     public MainForm(int id,JFrame loginFrame) {
         initComponents();
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        
         setTitle("Stock organizer");
         this.id = id;
         this.loginFrame = loginFrame;
-        getPerson();
-        if(!isUserInformationPresent()){
-            JOptionPane.showMessageDialog(null, "Your account seems to be empty. \nCall administrator now.", "Account error", JOptionPane.ERROR_MESSAGE);
-            dispose();
-            loginFrame.setVisible(true);
-        }else{
-            String fullName = person.getFirstName() + " " + person.getLastName();
-            String cardID = person.getCardId();
-            lblWelcomeUser.setText("Welcome " + fullName);
-            lblCardID.setText("Card ID: " + cardID);
-        }
+        showUserInfo();
         hideColumn(4);
         fillTable();
-        
+        setResizable(false);
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -486,7 +475,22 @@ public class MainForm extends javax.swing.JFrame {
         UpdateCustomerForm updateCustomerForm = new UpdateCustomerForm(this);
     }//GEN-LAST:event_menuUpdateCustomerActionPerformed
     
+    public void showUserInfo(){
+        getPerson();
+        if(!isUserInformationPresent()){
+            JOptionPane.showMessageDialog(null, "Your account seems to be empty. \nCall administrator now.", "Account error", JOptionPane.ERROR_MESSAGE);
+            dispose();
+            loginFrame.setVisible(true);
+        }else{
+            String fullName = person.getFirstName() + " " + person.getLastName();
+            String cardID = person.getCardId();
+            lblWelcomeUser.setText("Welcome " + fullName);
+            lblCardID.setText("Card ID: " + cardID);
+        }
+    }
+    
     private void getPerson(){
+        person = null;
         ConnectionProvider conn = new ConnectionProvider();
         person = conn.getPersonByID(id);
     }

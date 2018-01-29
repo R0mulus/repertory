@@ -42,6 +42,7 @@ public class ShipGoodsDialog extends javax.swing.JDialog {
         cmbShipper.setPreferredSize(new Dimension(150,25));
         setLocationRelativeTo(null);
         setTitle("Shipping goods");
+        setResizable(false);
         setVisible(true);
     }
 
@@ -328,21 +329,35 @@ public class ShipGoodsDialog extends javax.swing.JDialog {
     private void btnConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmActionPerformed
         int customerIndex = cmbCustomer.getSelectedIndex();
         int shipperIndex = cmbShipper.getSelectedIndex();
-        String quantity = tableGoods.getValueAt(tableGoods.getSelectedRow(), 2).toString();
-        int selectedTableGoodsID = Integer.parseInt(tableGoods.getValueAt(tableGoods.getSelectedRow(), 4).toString());
-        int realQuantity = findRealQuantityOfGoods(selectedTableGoodsID);
+        String quantity = "-1";
+        int selectedTableGoodsID = -1;
         int quantityFromTable = 0;
-        int[] correctInputs = new int[3];
+        int[] correctInputs = new int[4];
         InputCheck inputCheck = new InputCheck();
+        
+        if(tableGoods.getSelectionModel().isSelectionEmpty()){
+            lblGoodsQuantityWarning.setText("Goods not selected!");
+            correctInputs[3] = 0;
+        }else{
+            quantity = tableGoods.getValueAt(tableGoods.getSelectedRow(), 2).toString();
+            selectedTableGoodsID = Integer.parseInt(tableGoods.getValueAt(tableGoods.getSelectedRow(), 4).toString());
+            lblGoodsQuantityWarning.setText(" ");
+            correctInputs[3] = 1;
+        }
+        
+        int realQuantity = findRealQuantityOfGoods(selectedTableGoodsID);
         
         if(!inputCheck.isInt(quantity)){
             lblGoodsQuantityWarning.setText("Only numbers are allowed!");
             correctInputs[0] = 0;
         }else{
             quantityFromTable = Integer.parseInt(quantity);
-            if(quantityFromTable > realQuantity || quantityFromTable == 0){
+            if(quantityFromTable > realQuantity){
                 lblGoodsQuantityWarning.setText("Not enough goods in stock!");
                 correctInputs[0] = 0;
+            }else if(quantityFromTable == 0 || quantityFromTable <= 0){
+                lblGoodsQuantityWarning.setText("Incorrect input!");
+                correctInputs[0] = 0; 
             }else{
                 lblGoodsQuantityWarning.setText(" ");
                 correctInputs[0] = 1;
@@ -369,7 +384,7 @@ public class ShipGoodsDialog extends javax.swing.JDialog {
         for(int a : correctInputs){
             sum += a;
         }
-        if(sum == 3){
+        if(sum == 4){
             ConnectionProvider conn = new ConnectionProvider();
             conn.updateGoodsQuantity(selectedTableGoodsID, quantityFromTable, '-');
             int idExpedition = conn.addNewExpedition(customerID, shipperID, userID);

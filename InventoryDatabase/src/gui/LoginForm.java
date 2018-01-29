@@ -23,6 +23,7 @@ public class LoginForm extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         setTitle("Stock organizer");
         lblLoginWarning.setText(" ");
+        setResizable(false);
         setVisible(true);
     }
 

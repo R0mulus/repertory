@@ -447,50 +447,60 @@ public class ConnectionProvider {
             }
         }
     }
-    
-    public void updateShipper(String name, String phone, String email, int idShipper){
-        String query = "UPDATE Shippers SET name LIKE ?, phone LIKE ?, email LIKE ?"
-                + " WHERE id LIKE ?";
+
+    public boolean updatePersonAndAccount(String firstName, String lastName, String email, String cardID, int idUser, int idAccount, String login, String password) throws SQLException {
         Connection conn = getConnection();
-        if (conn != null) {
-            try(PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setString(1, name);
-                ps.setString(2, phone);
-                ps.setString(3, email);
-                ps.setInt(4, idShipper);
-                ps.executeUpdate();
+        
+        String queryUserPersonal = "UPDATE UserPersonal SET cardID = ?,"
+                + " firstName = ?,"
+                + " lastName = ?,"
+                + " email = ?"
+                + " WHERE id = ?";
+
+        String queryAccount = "UPDATE Accounts SET login = ?, password = PASSWORD(?), lastPasswordChange = ?" 
+                + " WHERE id = ?";
+
+        
+        if(conn != null){
+            try{
+                conn.setAutoCommit(false);
+                PreparedStatement ps = conn.prepareStatement(queryUserPersonal);
+                ps.setString(1, cardID);
+                ps.setString(2, firstName);
+                ps.setString(3, lastName);
+                ps.setString(4, email);
+                ps.setInt(5, idUser);
+                ps.execute();
                 ps.close();
+                
+                ps = conn.prepareStatement(queryAccount);
+                ps.setString(1, login);
+                ps.setString(2, password);
+                ps.setString(3, getCurrentDateTime());
+                ps.setInt(4, idAccount);
+                ps.execute();
+                ps.close();
+                
+                conn.commit();
+                
+            }catch(SQLException ex){
+                System.out.println("Error: " + ex.toString());
+                try {
+                    System.out.print("User + account update transaction is being rolled back.");
+                    conn.rollback();
+                    return false;
+                } catch(SQLException excep) {
+                    System.out.println("Error: " + excep.toString());
+                }
+            }finally {
+                conn.setAutoCommit(true);
                 conn.close();
             }
-            catch(SQLException ex){
-                System.out.println("Error: " + ex.toString());
-            }
         }
+        return true;
     }
     
-    public void updateAddress(int idAddress, String country, String countryState, String postalCode, String city, String street, int streetNum){
-        String query = "UPDATE Addresses SET country LIKE ?, countryState LIKE ?, postalCode LIKE ?, city LIKE ?, street LIKE ?, streetNum = ?" 
-                + " WHERE id LIKE ?";
-        Connection conn = getConnection();
-        if (conn != null) {
-            try(PreparedStatement ps = conn.prepareStatement(query)) {
-                ps.setString(1, country);
-                ps.setString(2, countryState);
-                ps.setString(3, postalCode);
-                ps.setString(4, city);
-                ps.setString(5, street);
-                ps.setInt(6, streetNum);
-                ps.setInt(7, idAddress);
-                ps.executeUpdate();
-                conn.close();
-            }
-            catch(SQLException ex){
-                System.out.println("Error: " + ex.toString());
-            }
-        }
-    }
-    
-    public boolean updateBusinessPartnerWithAddress(String table, String name, String phone, String email, int idShipper, int idAddress, String country, String countryState, String postalCode, String city, String street, int streetNum) throws SQLException {
+    public boolean updateBusinessPartnerAndAddress(String table, String name, String phone, String email, int idShipper, int idAddress, String country, String countryState, String postalCode, String city, String street, int streetNum) throws SQLException {
         Connection conn = getConnection();
         
         String queryShipper = "UPDATE " + table + " SET name = ?,"
@@ -527,7 +537,7 @@ public class ConnectionProvider {
             }catch(SQLException ex){
                 System.out.println("Error: " + ex.toString());
                 try {
-                    System.out.print("Transaction is being rolled back.");
+                    System.out.print(table + " update transaction is being rolled back.");
                     conn.rollback();
                     return false;
                 } catch(SQLException excep) {

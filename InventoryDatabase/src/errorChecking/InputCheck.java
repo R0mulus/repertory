@@ -45,17 +45,17 @@ public class InputCheck {
     public boolean isEmailInDatabase(String email){
         refreshLists();
         for(Customer customer : customers){
-            if((customer.getName()).equalsIgnoreCase(email)){
+            if((customer.getEmail()).equalsIgnoreCase(email)){
                 return true;
             }
         }
         for(Shipper shipper : shippers){
-            if((shipper.getName()).equalsIgnoreCase(email)){
+            if((shipper.getEmail()).equalsIgnoreCase(email)){
                 return true;
             }
         }
         for(Supplier supplier : suppliers){
-            if((supplier.getName()).equalsIgnoreCase(email)){
+            if((supplier.getEmail()).equalsIgnoreCase(email)){
                 return true;
             }
         }
@@ -74,7 +74,8 @@ public class InputCheck {
                         if((customer.getName()).equalsIgnoreCase(name)){
                             return true;
                         }
-                     }return false;
+                     }
+                     return false;
             case 'i':for(Shipper ship : shippers){
                         if((ship.getName()).equalsIgnoreCase(name)){
                             return true;
@@ -130,24 +131,30 @@ public class InputCheck {
     *   check if string can be parsed to long data type
     */
     private boolean isLong(String text){
-        try {
-            Long.parseLong(text);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
+        if(text.trim().length() > 0){
+            try {
+                Long.parseLong(text);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
         }
+        return false;
     }
     
     /*
     *   check if string can be parsed to double data type
     */
     public boolean isDouble(String text){
-        try {
-            Double.parseDouble(text);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
+        if(text.trim().length() > 0){
+            try {
+                Double.parseDouble(text);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
         }
+        return false;
     }
     
     /*
@@ -199,7 +206,7 @@ public class InputCheck {
                     return false;
                 }
             }
-            return true;
+            return hasDigit && hasLetter == true;
         }
         return false;
     }

@@ -423,6 +423,9 @@ public class ArrivalOfGoodsDialog extends javax.swing.JDialog {
         if(!inputCheck.isInt(txtGoodsQuantity.getText().trim())){
             lblGoodsQuantityIncorrect.setText("Incorrect input!");
             correctInputs[2] = 0;
+        }else if(Integer.parseInt(txtGoodsQuantity.getText().trim()) <= 0){
+            lblGoodsQuantityIncorrect.setText("Incorrect input!");
+            correctInputs[2] = 0;
         }else{
             lblGoodsQuantityIncorrect.setText(" ");
             quantity = Integer.parseInt(txtGoodsQuantity.getText().trim());
@@ -436,6 +439,9 @@ public class ArrivalOfGoodsDialog extends javax.swing.JDialog {
             Double value = Double.parseDouble(txtGoodsPrice.getText().trim());
             if(inputCheck.hasNumberSurpassedDecimalPoint(value, 2)){
                 lblGoodsPriceIncorrect.setText("Too many decimal points!");
+                correctInputs[3] = 0;
+            }else if(Double.parseDouble(txtGoodsPrice.getText().trim()) <= 0){
+                lblGoodsPriceIncorrect.setText("Incorrect input!");
                 correctInputs[3] = 0;
             }else{
                 lblGoodsPriceIncorrect.setText(" ");

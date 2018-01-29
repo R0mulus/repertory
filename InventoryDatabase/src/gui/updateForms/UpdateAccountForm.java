@@ -6,11 +6,17 @@
 package gui.updateForms;
 
 import database.ConnectionProvider;
+import errorChecking.InputCheck;
+import gui.MainForm;
 import inventorydatabase.Account;
 import inventorydatabase.Person;
 import java.awt.Dimension;
+import java.sql.SQLException;
 import java.util.List;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,16 +26,21 @@ public class UpdateAccountForm extends javax.swing.JFrame {
 
     private List<Person> people;
     private List<Account> accounts;
-    private JFrame rootFrame;
+    private Account initialAccount;
+    private int accountID;
+    private Person initialPerson;
+    private int personID;
+    private MainForm mainForm;
     /**
      * Creates new form UpdateAccountForm
      */
-    public UpdateAccountForm(JFrame rootFrame) {
+    public UpdateAccountForm(MainForm mainForm) {
         initComponents();
-        this.rootFrame = rootFrame;
-        rootFrame.setVisible(false);
+        this.mainForm = mainForm;
+        mainForm.setVisible(false);
         fillPeople();
-        cmbAccounts.setPreferredSize(new Dimension(150,25));
+        fillAccounts();
+        cmbAccounts.setPreferredSize(new Dimension(180,25));
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setTitle("Updating account");
@@ -39,7 +50,7 @@ public class UpdateAccountForm extends javax.swing.JFrame {
     
     private void fillPeople(){
         people = new ConnectionProvider().getPeople();
-        if(people != null && people.size() > 0){
+        if(people != null || people.size() > 0){
             for(Person person : people){
                 String item = person.getFirstName() + " " + person.getLastName() + " | " + person.getCardId();
                 cmbAccounts.addItem(item);
@@ -50,6 +61,30 @@ public class UpdateAccountForm extends javax.swing.JFrame {
     private void fillAccounts(){
         accounts = new ConnectionProvider().getAccounts();
     }
+    
+    private void fillTxtFields(int person_ID){
+        for(Person person : people){
+            if(person.getId() == person_ID){
+                initialPerson = person;
+                txtFirstName.setText(initialPerson.getFirstName());
+                txtLastName.setText(initialPerson.getLastName());
+                txtCardID.setText(initialPerson.getCardId());
+                txtEmail.setText(initialPerson.getEmail());
+            }
+        }
+        txtLogin.setText(initialAccount.getLogin());
+    }
+    
+    private void findAccountInfo(int accID){
+        if(accounts != null || accounts.size() > 0){
+            for(Account account : accounts){
+                if(account.getId() == accID){
+                    initialAccount = account;
+                }
+            }
+        }
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -62,6 +97,29 @@ public class UpdateAccountForm extends javax.swing.JFrame {
 
         cmbAccounts = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
+        lblFirstNameWarning = new javax.swing.JLabel();
+        txtLogin = new javax.swing.JTextField();
+        lblLastNameWarning = new javax.swing.JLabel();
+        txtPassword1 = new javax.swing.JPasswordField();
+        lblCardIDWarning = new javax.swing.JLabel();
+        txtPassword2 = new javax.swing.JPasswordField();
+        lblEmailWarning = new javax.swing.JLabel();
+        txtFirstName = new javax.swing.JTextField();
+        btnConfirm = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        txtLastName = new javax.swing.JTextField();
+        btnCancel = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        txtCardID = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        txtEmail = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        lblLoginWarning = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        lblPassword1Warning = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        lblPassword2Warning = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -70,20 +128,162 @@ public class UpdateAccountForm extends javax.swing.JFrame {
             }
         });
 
-        cmbAccounts.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cmbAccounts.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Choose" }));
+        cmbAccounts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbAccountsActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Choose: ");
+
+        lblFirstNameWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblFirstNameWarning.setText(" ");
+
+        txtLogin.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtLoginKeyTyped(evt);
+            }
+        });
+
+        lblLastNameWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblLastNameWarning.setText(" ");
+
+        txtPassword1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPassword1KeyTyped(evt);
+            }
+        });
+
+        lblCardIDWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblCardIDWarning.setText(" ");
+
+        txtPassword2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPassword2KeyTyped(evt);
+            }
+        });
+
+        lblEmailWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblEmailWarning.setText(" ");
+
+        txtFirstName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtFirstNameKeyTyped(evt);
+            }
+        });
+
+        btnConfirm.setText("Confirm");
+        btnConfirm.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        btnConfirm.setMaximumSize(new java.awt.Dimension(70, 23));
+        btnConfirm.setMinimumSize(new java.awt.Dimension(70, 23));
+        btnConfirm.setPreferredSize(new java.awt.Dimension(70, 23));
+        btnConfirm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConfirmActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setText("Login: ");
+
+        txtLastName.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtLastNameKeyTyped(evt);
+            }
+        });
+
+        btnCancel.setText("Cancel");
+        btnCancel.setMargin(new java.awt.Insets(2, 2, 2, 2));
+        btnCancel.setMaximumSize(new java.awt.Dimension(70, 23));
+        btnCancel.setMinimumSize(new java.awt.Dimension(70, 23));
+        btnCancel.setPreferredSize(new java.awt.Dimension(70, 23));
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("Password: ");
+
+        txtCardID.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtCardIDKeyTyped(evt);
+            }
+        });
+
+        jLabel4.setText("Repeat password: ");
+
+        txtEmail.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtEmailKeyTyped(evt);
+            }
+        });
+
+        jLabel5.setText("First name: ");
+
+        lblLoginWarning.setForeground(new java.awt.Color(255, 0, 0));
+        lblLoginWarning.setText(" ");
+
+        jLabel6.setText("Last name:");
+
+        lblPassword1Warning.setForeground(new java.awt.Color(255, 0, 0));
+        lblPassword1Warning.setText(" ");
+
+        jLabel7.setText("Card ID:");
+
+        lblPassword2Warning.setForeground(new java.awt.Color(255, 0, 0));
+        lblPassword2Warning.setText(" ");
+
+        jLabel9.setText("Email:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGap(41, 41, 41)
-                .addComponent(cmbAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(250, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1)
+                        .addGap(41, 41, 41)
+                        .addComponent(cmbAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(30, 30, 30)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(38, 38, 38)
+                                .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(42, 42, 42)
+                                .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel2)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel7)
+                                    .addComponent(jLabel9))
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtCardID, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtLastName, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txtFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(2, 2, 2)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(txtPassword1, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addComponent(txtPassword2, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(lblEmailWarning)
+                            .addComponent(lblCardIDWarning)
+                            .addComponent(lblLastNameWarning)
+                            .addComponent(lblFirstNameWarning)
+                            .addComponent(lblPassword2Warning)
+                            .addComponent(lblPassword1Warning)
+                            .addComponent(lblLoginWarning))))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -92,19 +292,301 @@ public class UpdateAccountForm extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbAccounts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
-                .addContainerGap(269, Short.MAX_VALUE))
+                .addGap(39, 39, 39)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(txtLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblLoginWarning)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(txtPassword1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblPassword1Warning)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(txtPassword2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblPassword2Warning)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(txtFirstName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblFirstNameWarning)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(txtLastName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblLastNameWarning)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(txtCardID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblCardIDWarning)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblEmailWarning)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        rootFrame.setVisible(true);
+        mainForm.showUserInfo();
+        mainForm.setVisible(true);
     }//GEN-LAST:event_formWindowClosed
+
+    private void txtLoginKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLoginKeyTyped
+        if(txtLogin.getText().length() >= 20){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtLoginKeyTyped
+
+    private void txtPassword1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPassword1KeyTyped
+        if(txtPassword1.getPassword().length >= 20){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtPassword1KeyTyped
+
+    private void txtPassword2KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPassword2KeyTyped
+        if(txtPassword2.getPassword().length >= 20){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtPassword2KeyTyped
+
+    private void txtFirstNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFirstNameKeyTyped
+        if(txtFirstName.getText().length() >= 20){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtFirstNameKeyTyped
+
+    private boolean isLoginInUse(String login){
+        for(Account acc : accounts){
+            if((acc.getLogin()).equalsIgnoreCase(login)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean isCardIDinUse(String cardID){
+        for(Person person : people){
+            if((person.getCardId()).equalsIgnoreCase(cardID)){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private void btnConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmActionPerformed
+        ConnectionProvider conn = new ConnectionProvider();
+        InputCheck inputCheck = new InputCheck();
+        int[] correctInputs = new int[7];
+        String login = txtLogin.getText().trim();
+        String password1 = new String(txtPassword1.getPassword());
+        String password2 = new String(txtPassword2.getPassword());
+        String firstName = txtFirstName.getText().trim();
+        String lastName = txtLastName.getText().trim();
+        String cardID = txtCardID.getText().trim();
+        String email = txtEmail.getText().trim();
+
+        
+        if(!initialAccount.getLogin().equalsIgnoreCase(login)){
+            if(!inputCheck.isInputLengthCorrect(login, 20, 6)){
+                lblLoginWarning.setText("Login length incorrect!");
+                correctInputs[0] = 0;
+            }else if(isLoginInUse(login)){
+                lblLoginWarning.setText("Login already in use!");
+                correctInputs[0] = 0;
+            }else{
+                lblLoginWarning.setText(" ");
+                correctInputs[0] = 1;
+            }
+        }else{
+            lblLoginWarning.setText(" ");
+            correctInputs[0] = 1;
+        }
+        
+
+        if(conn.isAccountPasswordValid(initialAccount.getLogin(), password1)){
+            JOptionPane.showMessageDialog(rootPane, "Cannot use same password!\nYou must change your password.","Password change",JOptionPane.ERROR_MESSAGE);
+            lblPassword1Warning.setText("Password must be changed.");
+            correctInputs[1] = 0;
+        }else{
+            if(!inputCheck.isPasswordStrongEnough(password1)){
+                lblPassword1Warning.setText("Only alphanumeric values between 8 to 20 characters!");
+                correctInputs[1] = 0;
+            }else{
+                lblPassword1Warning.setText(" ");
+                correctInputs[1] = 1;
+            }
+        }
+
+        if(!inputCheck.doPasswordsMatch(password1, password2)){
+            lblPassword2Warning.setText("Passwords do not match!");
+            correctInputs[2] = 0;
+        }else{
+            lblPassword2Warning.setText(" ");
+            correctInputs[2] = 1;
+        }
+
+        if(!initialPerson.getFirstName().equalsIgnoreCase(firstName)){
+            if(!inputCheck.isInputLengthCorrect(firstName, 20, 1)){
+                lblFirstNameWarning.setText("Incorrect length!");
+                correctInputs[3] = 0;
+            }else{
+                lblFirstNameWarning.setText(" ");
+                correctInputs[3] = 1;
+            }
+        }else{
+            lblFirstNameWarning.setText(" ");
+            correctInputs[3] = 1;
+        }
+        
+        if(!initialPerson.getLastName().equalsIgnoreCase(lastName)){
+            if(!inputCheck.isInputLengthCorrect(lastName, 20, 1)){
+                lblLastNameWarning.setText("Incorrect length!");
+                correctInputs[4] = 0;
+            }else{
+                lblLastNameWarning.setText(" ");
+                correctInputs[4] = 1;
+            }
+        }else{
+            lblLastNameWarning.setText(" ");
+            correctInputs[4] = 1;
+        }
+        
+        if(!initialPerson.getCardId().equalsIgnoreCase(cardID)){
+            if(!inputCheck.isInputLengthCorrect(cardID, 10, 10)){
+                lblCardIDWarning.setText("Must be exactly 10 characters long!");
+                correctInputs[5] = 0;
+            }else if(isCardIDinUse(cardID)){
+                lblCardIDWarning.setText("Card already in use!");
+                correctInputs[5] = 0;
+            }else{
+                lblCardIDWarning.setText(" ");
+                correctInputs[5] = 1;
+            }
+        }else{
+            lblCardIDWarning.setText(" ");
+            correctInputs[5] = 1;
+        }
+        
+        if(!initialPerson.getEmail().equalsIgnoreCase(email)){
+            if(!inputCheck.isEmailCorrect(email) || !inputCheck.isInputLengthCorrect(email, 100, 5)){
+                lblEmailWarning.setText("Incorrect email format!");
+                correctInputs[6] = 0;
+            }else if(inputCheck.isEmailInDatabase(email)){
+                lblEmailWarning.setText("Email already in use!");
+                correctInputs[6] = 0;
+            }else{
+                lblEmailWarning.setText(" ");
+                correctInputs[6] = 1;
+            }
+        }else{
+            lblEmailWarning.setText(" ");
+            correctInputs[6] = 1;
+        }
+        
+
+        int sum = 0;
+        for(int i : correctInputs){
+            sum += i;
+        }
+        //ZMENIT NA UPDATE + conn vytvorit update
+        if(sum == 7){
+            try {
+                conn.updatePersonAndAccount(firstName,lastName,email,cardID,personID,accountID,login,password1);
+            } catch (SQLException ex) {
+                Logger.getLogger(UpdateCustomerForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            JOptionPane.showMessageDialog(null, "User '" + firstName + " " + lastName + "' with card '" + cardID + "' altered!");
+            this.dispose();
+        }
+    }//GEN-LAST:event_btnConfirmActionPerformed
+
+    private void txtLastNameKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLastNameKeyTyped
+        if(txtLastName.getText().length() >= 20){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtLastNameKeyTyped
+
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        dispose();
+    }//GEN-LAST:event_btnCancelActionPerformed
+
+    private void txtCardIDKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCardIDKeyTyped
+        if(txtCardID.getText().length() >= 10){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtCardIDKeyTyped
+
+    private void txtEmailKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEmailKeyTyped
+        if(txtEmail.getText().length() >= 100){
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtEmailKeyTyped
+
+    private void cmbAccountsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbAccountsActionPerformed
+        int index = cmbAccounts.getSelectedIndex();
+        if (index > 0) {
+            Person selectedPerson = people.get(index - 1);
+            personID = selectedPerson.getId();
+            accountID = selectedPerson.getIdAcc();
+            findAccountInfo(accountID);
+            fillTxtFields(personID);
+            
+        }else{
+            txtLogin.setText("");
+            txtPassword1.setText("");
+            txtPassword2.setText("");
+            txtFirstName.setText("");
+            txtLastName.setText("");
+            txtCardID.setText("");
+            txtEmail.setText("");
+        }
+    }//GEN-LAST:event_cmbAccountsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnConfirm;
     private javax.swing.JComboBox<String> cmbAccounts;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel lblCardIDWarning;
+    private javax.swing.JLabel lblEmailWarning;
+    private javax.swing.JLabel lblFirstNameWarning;
+    private javax.swing.JLabel lblLastNameWarning;
+    private javax.swing.JLabel lblLoginWarning;
+    private javax.swing.JLabel lblPassword1Warning;
+    private javax.swing.JLabel lblPassword2Warning;
+    private javax.swing.JTextField txtCardID;
+    private javax.swing.JTextField txtEmail;
+    private javax.swing.JTextField txtFirstName;
+    private javax.swing.JTextField txtLastName;
+    private javax.swing.JTextField txtLogin;
+    private javax.swing.JPasswordField txtPassword1;
+    private javax.swing.JPasswordField txtPassword2;
     // End of variables declaration//GEN-END:variables
 }

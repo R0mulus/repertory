@@ -127,7 +127,6 @@ public class PastExpeditionsDialog extends javax.swing.JDialog {
 
         Calendar today = Calendar.getInstance();
         String dateString = sdf.format(cal.getTime());
-        System.out.println(dateString);
         if(cal.compareTo(today) > 0){
             JOptionPane.showMessageDialog(rootPane, "Cannot pick future date!","Invalid date",JOptionPane.ERROR_MESSAGE);
             fillListWithExpeditions(dateString);

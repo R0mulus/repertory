@@ -5,8 +5,8 @@ USE Inventory;
 
 CREATE TABLE Accounts(
 	id INT NOT NULL AUTO_INCREMENT,
-	login VARCHAR(30) NOT NULL,
-	password VARCHAR(20) NOT NULL,
+	login VARCHAR(20) NOT NULL,
+	password TEXT NOT NULL,
 	dateCreated DATE NOT NULL,
 	lastPasswordChange DATE NOT NULL,
 	PRIMARY KEY(id)
@@ -16,8 +16,8 @@ CREATE TABLE UserPersonal(
 	id INT NOT NULL AUTO_INCREMENT,
 	idAccount INT NOT NULL,
 	cardId VARCHAR(10) NOT NULL,
-	firstName VARCHAR(50) NOT NULL,
-	lastName VARCHAR(50) NOT NULL,
+	firstName VARCHAR(20) NOT NULL,
+	lastName VARCHAR(20) NOT NULL,
 	email VARCHAR(100) NOT NULL,
 	PRIMARY KEY(id),
 	FOREIGN KEY(idAccount) REFERENCES Accounts(id)
@@ -82,7 +82,6 @@ CREATE TABLE Expeditions(
 	idCustomer INT NOT NULL,
 	idShipper INT NOT NULL,
 	idUser INT NOT NULL,
-	expeditionDate DATE NOT NULL,
 	PRIMARY KEY(id),
 	FOREIGN KEY(idCustomer) REFERENCES Customers(id)
 		ON DELETE CASCADE ON UPDATE RESTRICT,
@@ -134,6 +133,6 @@ CREATE TABLE ArrivalDetails(
 		ON DELETE CASCADE ON UPDATE RESTRICT
 );
 
-insert into accounts (login, password,datecreated,lastpasswordchange) values('admin','admin','2017-12-1','2017-12-1');
+insert into accounts (login, password,datecreated,lastpasswordchange) values('admin',PASSWORD('admin'),'2017-12-1','2017-12-1');
 insert into userpersonal(idaccount,cardid,firstname,lastname,email) values(1,'00001ITAA1','Jozef','Bálint','balintj@companyname.com');
 INSERT INTO Goods(name, code, quantity, priceperunit) VALUES('sruby','ASD45XS',5000,0.49);
